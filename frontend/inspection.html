@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DocAI780 | Product Inspection</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f8ff;
+            color: #1d2739;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        header {
+            background: white;
+            height: 75px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 6%;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.06);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1769ff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            width: 35px;
+            height: 35px;
+            background: #1769ff;
+            color: white;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .logo span {
+            color: #1d2739;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #465166;
+            font-size: 15px;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #1769ff;
+        }
+
+        .nav-links .active {
+            color: #1769ff;
+            font-weight: bold;
+        }
+
+        .nav-button {
+            background: #1769ff;
+            color: white !important;
+            padding: 11px 18px;
+            border-radius: 8px;
+        }
+
+        /* ================= MAIN ================= */
+
+        .inspection-container {
+            width: 86%;
+            max-width: 1200px;
+            margin: 50px auto;
+        }
+
+        .page-heading {
+            margin-bottom: 35px;
+        }
+
+        .page-heading h1 {
+            font-size: 34px;
+            margin-bottom: 10px;
+        }
+
+        .page-heading p {
+            color: #687386;
+            font-size: 16px;
+        }
+
+        /* ================= GRID ================= */
+
+        .inspection-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.06);
+        }
+
+        .card h2 {
+            font-size: 21px;
+            margin-bottom: 8px;
+        }
+
+        .card-description {
+            color: #7b8494;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        /* ================= UPLOAD ================= */
+
+        .upload-box {
+            border: 2px dashed #b9c8e8;
+            background: #f8faff;
+            border-radius: 14px;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 25px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .upload-box:hover {
+            border-color: #1769ff;
+            background: #f2f6ff;
+        }
+
+        .upload-icon {
+            width: 65px;
+            height: 65px;
+            background: #eaf1ff;
+            color: #1769ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        .upload-box h3 {
+            margin-bottom: 8px;
+        }
+
+        .upload-box p {
+            color: #7b8494;
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+        .upload-button {
+            background: #1769ff;
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .upload-button:hover {
+            background: #0d55d9;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        /* ================= IMAGE PREVIEW ================= */
+
+        .preview-container {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .preview-container img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            border-radius: 10px;
+            border: 1px solid #e3e8f0;
+        }
+
+        .remove-image {
+            margin-top: 10px;
+            background: #fee2e2;
+            color: #b91c1c;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        /* ================= FORM ================= */
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #dce2eb;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #1769ff;
+        }
+
+        /* ================= AI INFO ================= */
+
+        .ai-box {
+            margin-top: 25px;
+            padding: 18px;
+            background: #eef5ff;
+            border-left: 4px solid #1769ff;
+            border-radius: 8px;
+        }
+
+        .ai-box h3 {
+            color: #1769ff;
+            margin-bottom: 7px;
+            font-size: 15px;
+        }
+
+        .ai-box p {
+            color: #596579;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* ================= BUTTON ================= */
+
+        .start-button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 15px;
+            background: #1769ff;
+            color: white;
+            border: none;
+            border-radius: 9px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .start-button:hover {
+            background: #0d55d9;
+        }
+
+        .start-button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        /* ================= STATUS ================= */
+
+        .inspection-status {
+            display: none;
+            margin-top: 15px;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .inspection-status.processing {
+            display: block;
+            background: #eef5ff;
+            color: #174ea6;
+        }
+
+        .inspection-status.success {
+            display: block;
+            background: #ecfdf5;
+            color: #047857;
+        }
+
+        .inspection-status.error {
+            display: block;
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        /* ================= PROCESS STEPS ================= */
+
+        .process {
+            margin-top: 30px;
+        }
+
+        .process h2 {
+            margin-bottom: 20px;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .step {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .step-number {
+            width: 38px;
+            height: 38px;
+            background: #eaf1ff;
+            color: #1769ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-weight: bold;
+        }
+
+        .step h3 {
+            font-size: 14px;
+            margin-bottom: 7px;
+        }
+
+        .step p {
+            font-size: 12px;
+            color: #7b8494;
+        }
+
+        /* ================= FOOTER ================= */
+
+        footer {
+            background: #111827;
+            color: white;
+            margin-top: 60px;
+            padding: 35px 7%;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-logo {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 900px) {
+
+            .inspection-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .steps {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .nav-links {
+                gap: 12px;
+            }
+
+        }
+
+        @media (max-width: 650px) {
+
+            header {
+                height: auto;
+                padding: 15px 5%;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .inspection-container {
+                width: 92%;
+            }
+
+            .steps {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- ================= NAVBAR ================= -->
+
+    <header>
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                ✓
+            </div>
+
+            <span>DocAI780</span>
+
+        </div>
+
+
+        <nav class="nav-links">
+
+            <a href="index.html">
+                Home
+            </a>
+
+            <a href="dashboard.html">
+                Dashboard
+            </a>
+
+            <a href="inspection.html" class="active">
+                Inspection
+            </a>
+
+            <a href="analysis.html">
+                Analysis
+            </a>
+
+            <a href="result.html">
+                Result
+            </a>
+
+            <a href="history.html">
+                History
+            </a>
+
+            <a href="report.html">
+                Reports
+            </a>
+
+            <a href="inspection.html" class="nav-button">
+                Start Inspection
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="inspection-container">
+
+
+        <div class="page-heading">
+
+            <h1>
+                Product Inspection
+            </h1>
+
+            <p>
+                Upload a packaged commodity label and let
+                DocAI780 analyze its compliance.
+            </p>
+
+        </div>
+
+
+        <!-- ================= INSPECTION GRID ================= -->
+
+        <section class="inspection-grid">
+
+
+            <!-- ================= UPLOAD CARD ================= -->
+
+            <div class="card">
+
+                <h2>
+                    Upload Product Label
+                </h2>
+
+                <p class="card-description">
+                    Upload a clear image of the front or back
+                    label of your packaged commodity.
+                </p>
+
+
+                <label for="productImage" class="upload-box">
+
+                    <div class="upload-icon">
+                        📷
+                    </div>
+
+                    <h3>
+                        Upload Product Image
+                    </h3>
+
+                    <p>
+                        JPG, JPEG or PNG
+                    </p>
+
+                    <span class="upload-button">
+                        Choose Image
+                    </span>
+
+                </label>
+
+
+                <input
+                    type="file"
+                    id="productImage"
+                    accept="image/jpeg,image/jpg,image/png"
+                >
+
+
+                <!-- IMAGE PREVIEW -->
+
+                <div
+                    class="preview-container"
+                    id="previewContainer"
+                >
+
+                    <img
+                        id="imagePreview"
+                        src=""
+                        alt="Product Preview"
+                    >
+
+                    <button
+                        type="button"
+                        class="remove-image"
+                        onclick="removeImage()"
+                    >
+                        Remove Image
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= PRODUCT DETAILS ================= -->
+
+            <div class="card">
+
+                <h2>
+                    Product Details
+                </h2>
+
+                <p class="card-description">
+                    These details are optional. DocAI780 will
+                    extract product information automatically from
+                    the uploaded label.
+                </p>
+
+
+                <div class="form-group">
+
+                    <label for="productName">
+                        Product Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="productName"
+                        placeholder="Optional — Example: Monaco"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="category">
+                        Product Category
+                    </label>
+
+                    <select id="category">
+
+                        <option value="">
+                            Optional — Select category
+                        </option>
+
+                        <option value="Food & Beverages">
+                            Food & Beverages
+                        </option>
+
+                        <option value="Grocery">
+                            Grocery
+                        </option>
+
+                        <option value="Dairy Products">
+                            Dairy Products
+                        </option>
+
+                        <option value="Edible Oil">
+                            Edible Oil
+                        </option>
+
+                        <option value="Personal Care">
+                            Personal Care
+                        </option>
+
+                        <option value="Household Products">
+                            Household Products
+                        </option>
+
+                        <option value="Other">
+                            Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="manufacturer">
+                        Manufacturer / Brand
+                    </label>
+
+                    <input
+                        type="text"
+                        id="manufacturer"
+                        placeholder="Optional — Example: Parle"
+                    >
+
+                </div>
+
+
+                <!-- AI INFORMATION -->
+
+                <div class="ai-box">
+
+                    <h3>
+                        🤖 AI-Powered Analysis
+                    </h3>
+
+                    <p>
+                        DocAI780 will extract label information
+                        using OCR, detect the barcode, analyze
+                        possible tampering, identify a reference
+                        product and evaluate applicable compliance
+                        rules.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="start-button"
+                    id="startInspectionButton"
+                    onclick="startInspection()"
+                >
+                    Start AI Inspection →
+                </button>
+
+
+                <!-- STATUS -->
+
+                <div
+                    id="inspectionStatus"
+                    class="inspection-status"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= PROCESS ================= -->
+
+        <section class="process">
+
+            <h2>
+                How the Inspection Works
+            </h2>
+
+
+            <div class="steps">
+
+
+                <div class="step">
+
+                    <div class="step-number">
+                        1
+                    </div>
+
+                    <h3>
+                        Upload
+                    </h3>
+
+                    <p>
+                        Upload the product label image.
+                    </p>
+
+                </div>
+
+
+                <div class="step">
+
+                    <div class="step-number">
+                        2
+                    </div>
+
+                    <h3>
+                        OCR Extraction
+                    </h3>
+
+                    <p>
+                        Extract text and label information.
+                    </p>
+
+                </div>
+
+
+                <div class="step">
+
+                    <div class="step-number">
+                        3
+                    </div>
+
+                    <h3>
+                        AI Analysis
+                    </h3>
+
+                    <p>
+                        Analyze the product against compliance rules.
+                    </p>
+
+                </div>
+
+
+                <div class="step">
+
+                    <div class="step-number">
+                        4
+                    </div>
+
+                    <h3>
+                        Result
+                    </h3>
+
+                    <p>
+                        Generate compliance result and report.
+                    </p>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <div class="footer-content">
+
+            <div class="footer-logo">
+                DocAI780
+            </div>
+
+
+            <div class="footer-links">
+
+                <a href="index.html">
+                    Home
+                </a>
+
+                <a href="dashboard.html">
+                    Dashboard
+                </a>
+
+                <a href="history.html">
+                    History
+                </a>
+
+                <a href="report.html">
+                    Reports
+                </a>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <script>
+
+        /* =========================================================
+           BACKEND CONFIGURATION
+           ========================================================= */
+
+        const API_BASE_URL = "http://localhost:8000";
+
+        const SCAN_ENDPOINT =
+            `${API_BASE_URL}/api/v1/scans`;
+
+
+        /* =========================================================
+           DOM ELEMENTS
+           ========================================================= */
+
+        const imageInput =
+            document.getElementById("productImage");
+
+        const previewContainer =
+            document.getElementById("previewContainer");
+
+        const imagePreview =
+            document.getElementById("imagePreview");
+
+        const startInspectionButton =
+            document.getElementById("startInspectionButton");
+
+        const inspectionStatus =
+            document.getElementById("inspectionStatus");
+
+
+        /* =========================================================
+           IMAGE PREVIEW
+           ========================================================= */
+
+        imageInput.addEventListener("change", function () {
+
+            const file = this.files[0];
+
+            if (!file) {
+                return;
+            }
+
+            const allowedTypes = [
+                "image/jpeg",
+                "image/jpg",
+                "image/png"
+            ];
+
+            if (!allowedTypes.includes(file.type)) {
+
+                showStatus(
+                    "Please select a JPG, JPEG or PNG image.",
+                    "error"
+                );
+
+                imageInput.value = "";
+                return;
+
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+
+                imagePreview.src =
+                    event.target.result;
+
+                previewContainer.style.display =
+                    "block";
+
+            };
+
+            reader.readAsDataURL(file);
+
+            clearStatus();
+
+        });
+
+
+        /* =========================================================
+           REMOVE IMAGE
+           ========================================================= */
+
+        function removeImage() {
+
+            imageInput.value = "";
+
+            imagePreview.src = "";
+
+            previewContainer.style.display =
+                "none";
+
+            clearStatus();
+
+        }
+
+
+        /* =========================================================
+           STATUS UI
+           ========================================================= */
+
+        function showStatus(message, type) {
+
+            inspectionStatus.textContent =
+                message;
+
+            inspectionStatus.className =
+                `inspection-status ${type}`;
+
+        }
+
+
+        function clearStatus() {
+
+            inspectionStatus.textContent = "";
+
+            inspectionStatus.className =
+                "inspection-status";
+
+        }
+
+
+        /* =========================================================
+           START AI INSPECTION
+           ========================================================= */
+
+        async function startInspection() {
+
+            const file =
+                imageInput.files[0];
+
+            const productName =
+                document
+                    .getElementById("productName")
+                    .value
+                    .trim();
+
+            const category =
+                document
+                    .getElementById("category")
+                    .value;
+
+            const manufacturer =
+                document
+                    .getElementById("manufacturer")
+                    .value
+                    .trim();
+
+
+            /* -----------------------------------------------------
+               Validate image
+               ----------------------------------------------------- */
+
+            if (!file) {
+
+                showStatus(
+                    "Please upload a product label image first.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            /* -----------------------------------------------------
+               Prepare UI
+               ----------------------------------------------------- */
+
+            startInspectionButton.disabled =
+                true;
+
+            startInspectionButton.textContent =
+                "Analyzing Product...";
+
+            showStatus(
+                "Uploading image and starting OCR, barcode, tampering and compliance analysis...",
+                "processing"
+            );
+
+
+            try {
+
+                /* -------------------------------------------------
+                   Create multipart form data
+                   ------------------------------------------------- */
+
+                const formData =
+                    new FormData();
+
+
+                /*
+                 * `file` is the uploaded image field used by
+                 * the FastAPI scan endpoint.
+                 */
+
+                formData.append(
+                    "file",
+                    file
+                );
+
+
+                /*
+                 * Consumer mode is used for the normal
+                 * product inspection workflow.
+                 */
+
+                formData.append(
+                    "mode",
+                    "consumer"
+                );
+
+
+                /* -------------------------------------------------
+                   Send image to FastAPI
+                   ------------------------------------------------- */
+
+                const response =
+                    await fetch(
+                        SCAN_ENDPOINT,
+                        {
+                            method: "POST",
+                            body: formData
+                        }
+                    );
+
+
+                /* -------------------------------------------------
+                   Read backend response
+                   ------------------------------------------------- */
+
+                let data = null;
+
+                try {
+
+                    data =
+                        await response.json();
+
+                } catch (jsonError) {
+
+                    throw new Error(
+                        `Backend returned an invalid response (HTTP ${response.status}).`
+                    );
+
+                }
+
+
+                /* -------------------------------------------------
+                   Handle backend error
+                   ------------------------------------------------- */
+
+                if (!response.ok) {
+
+                    const backendMessage =
+                        data?.detail ||
+                        data?.message ||
+                        data?.error ||
+                        `Inspection failed (HTTP ${response.status}).`;
+
+                    throw new Error(
+                        backendMessage
+                    );
+
+                }
+
+
+                /* -------------------------------------------------
+                   Validate successful response
+                   ------------------------------------------------- */
+
+                if (!data || !data.scan_id) {
+
+                    throw new Error(
+                        "Backend completed the request but did not return a scan ID."
+                    );
+
+                }
+
+
+                /* -------------------------------------------------
+                   Save inspection data for other frontend pages
+                   ------------------------------------------------- */
+
+                sessionStorage.setItem(
+                    "lastScanResult",
+                    JSON.stringify(data)
+                );
+
+
+                sessionStorage.setItem(
+                    "lastScanId",
+                    String(data.scan_id)
+                );
+
+
+                /*
+                 * Store optional user-entered information separately.
+                 * Backend-extracted information remains authoritative.
+                 */
+
+                sessionStorage.setItem(
+                    "manualProductName",
+                    productName
+                );
+
+                sessionStorage.setItem(
+                    "manualCategory",
+                    category
+                );
+
+                sessionStorage.setItem(
+                    "manualManufacturer",
+                    manufacturer
+                );
+
+
+                /* -------------------------------------------------
+                   Success message
+                   ------------------------------------------------- */
+
+                showStatus(
+                    `Inspection completed successfully. Scan ID: ${data.scan_id}`,
+                    "success"
+                );
+
+
+                /*
+                 * Small delay so user can see success state before
+                 * moving to the analysis screen.
+                 */
+
+                setTimeout(
+                    function () {
+
+                        window.location.href =
+                            "analysis.html";
+
+                    },
+                    700
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Inspection Error:",
+                    error
+                );
+
+
+                showStatus(
+                    `Inspection failed: ${error.message}`,
+                    "error"
+                );
+
+
+                startInspectionButton.disabled =
+                    false;
+
+                startInspectionButton.textContent =
+                    "Start AI Inspection →";
+
+            }
+
+        }
+
+
+        /* =========================================================
+           CHECK BACKEND AVAILABILITY
+           ========================================================= */
+
+        async function checkBackend() {
+
+            try {
+
+                const response =
+                    await fetch(
+                        `${API_BASE_URL}/api/v1/health`
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Backend health check failed."
+                    );
+
+                }
+
+                console.log(
+                    "✅ FastAPI backend is reachable."
+                );
+
+
+            } catch (error) {
+
+                console.warn(
+                    "⚠️ FastAPI backend is not currently reachable.",
+                    error
+                );
+
+            }
+
+        }
+
+
+        /* =========================================================
+           INITIALIZE
+           ========================================================= */
+
+        checkBackend();
+
+    </script>
+
+
+</body>
+
+</html>

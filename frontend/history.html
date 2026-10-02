@@ -1,0 +1,1857 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Inspection History | DocAI780</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background: #f5f8ff;
+            color: #1f2937;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        .navbar {
+            height: 70px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 7%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 23px;
+            font-weight: bold;
+            color: #1769ff;
+        }
+
+        .logo-icon {
+            width: 34px;
+            height: 34px;
+            background: #1769ff;
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #4b5563;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: #1769ff;
+        }
+
+        .nav-links .active {
+            color: #1769ff;
+            font-weight: bold;
+        }
+
+        .nav-button {
+            background: #1769ff;
+            color: white !important;
+            padding: 11px 18px;
+            border-radius: 8px;
+        }
+
+        .nav-button:hover {
+            background: #0d55d9;
+        }
+
+        /* ================= MAIN ================= */
+
+        .container {
+            width: 86%;
+            max-width: 1250px;
+            margin: 45px auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: #6b7280;
+            font-size: 15px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .new-btn,
+        .clear-btn {
+            text-decoration: none;
+            padding: 13px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+        }
+
+        .new-btn {
+            background: #1769ff;
+            color: white;
+        }
+
+        .new-btn:hover {
+            background: #0d55d9;
+        }
+
+        .clear-btn {
+            background: #eef3fb;
+            color: #1769ff;
+        }
+
+        .clear-btn:hover {
+            background: #e1e9f8;
+        }
+
+        /* ================= STAT CARDS ================= */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 10px;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #111827;
+        }
+
+        /* ================= HISTORY CARD ================= */
+
+        .history-card {
+            background: white;
+            border-radius: 14px;
+            padding: 25px;
+            box-shadow: 0 3px 18px rgba(0, 0, 0, 0.06);
+        }
+
+        .history-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            gap: 15px;
+        }
+
+        .history-top h2 {
+            font-size: 20px;
+            color: #111827;
+        }
+
+        /* ================= SEARCH ================= */
+
+        .search-box {
+            width: 280px;
+            padding: 11px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .search-box:focus {
+            border-color: #1769ff;
+        }
+
+        /* ================= FILTERS ================= */
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 15px;
+            border: 1px solid #d1d5db;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #4b5563;
+        }
+
+        .filter-btn:hover {
+            border-color: #1769ff;
+            color: #1769ff;
+        }
+
+        .filter-btn.active {
+            background: #1769ff;
+            color: white;
+            border-color: #1769ff;
+        }
+
+        /* ================= TABLE ================= */
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        th {
+            text-align: left;
+            padding: 14px;
+            background: #f5f8ff;
+            color: #4b5563;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        td {
+            padding: 16px 14px;
+            border-bottom: 1px solid #edf0f5;
+            font-size: 14px;
+            color: #374151;
+        }
+
+        tr:hover {
+            background: #fafcff;
+        }
+
+        .product-name {
+            font-weight: bold;
+            color: #111827;
+        }
+
+        .scan-id {
+            color: #6b7280;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .date {
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        /* ================= STATUS ================= */
+
+        .status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .compliant {
+            background: #e8f8ee;
+            color: #16803c;
+        }
+
+        .warning {
+            background: #fff5d9;
+            color: #a66a00;
+        }
+
+        .non-compliant {
+            background: #fdeaea;
+            color: #c62828;
+        }
+
+        /* ================= SCORE ================= */
+
+        .score {
+            font-weight: bold;
+        }
+
+        .high-score {
+            color: #16803c;
+        }
+
+        .medium-score {
+            color: #a66a00;
+        }
+
+        .low-score {
+            color: #c62828;
+        }
+
+        /* ================= ACTION BUTTONS ================= */
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            text-decoration: none;
+            padding: 7px 11px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid #dbe3f0;
+            color: #1769ff;
+            background: white;
+            cursor: pointer;
+        }
+
+        .action-btn:hover {
+            background: #eef4ff;
+        }
+
+        .report-btn {
+            color: #374151;
+        }
+
+        /* ================= EMPTY STATE ================= */
+
+        .empty-state {
+            text-align: center;
+            padding: 55px 20px;
+            color: #6b7280;
+        }
+
+        .empty-icon {
+            width: 65px;
+            height: 65px;
+            margin: 0 auto 16px;
+            border-radius: 50%;
+            background: #eef4ff;
+            color: #1769ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .empty-state h3 {
+            color: #111827;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            line-height: 1.6;
+            max-width: 520px;
+            margin: 0 auto 18px;
+        }
+
+        /* ================= INFO BAR ================= */
+
+        .info-bar {
+            margin-bottom: 20px;
+            padding: 13px 15px;
+            background: #eef5ff;
+            border-left: 4px solid #1769ff;
+            border-radius: 8px;
+            color: #4b5563;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* ================= FOOTER ================= */
+
+        footer {
+            background: #111827;
+            color: #9ca3af;
+            text-align: center;
+            padding: 25px;
+            margin-top: 60px;
+            font-size: 13px;
+        }
+
+        footer strong {
+            color: white;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 1000px) {
+
+            .nav-links {
+                gap: 12px;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+        @media (max-width: 750px) {
+
+            .navbar {
+                height: auto;
+                padding: 15px 5%;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 18px;
+            }
+
+            .header-actions {
+                width: 100%;
+            }
+
+            .new-btn,
+            .clear-btn {
+                flex: 1;
+                text-align: center;
+            }
+
+            .history-top {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+        }
+
+        @media (max-width: 550px) {
+
+            .container {
+                width: 92%;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header h1 {
+                font-size: 27px;
+            }
+
+            .header-actions {
+                flex-direction: column;
+            }
+
+            .new-btn,
+            .clear-btn {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- ================= NAVBAR ================= -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                ✓
+            </div>
+
+            DocAI780
+
+        </div>
+
+
+        <div class="nav-links">
+
+            <a href="index.html">
+                Home
+            </a>
+
+            <a href="dashboard.html">
+                Dashboard
+            </a>
+
+            <a href="inspection.html">
+                Inspection
+            </a>
+
+            <a href="analysis.html">
+                Analysis
+            </a>
+
+            <a href="result.html">
+                Result
+            </a>
+
+            <a
+                href="history.html"
+                class="active"
+            >
+                History
+            </a>
+
+            <a href="report.html">
+                Reports
+            </a>
+
+            <a
+                href="inspection.html"
+                class="nav-button"
+            >
+                New Inspection
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="container">
+
+
+        <!-- ================= PAGE HEADER ================= -->
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>
+                    Inspection History
+                </h1>
+
+                <p>
+                    View previous product compliance inspections
+                    recorded in this browser.
+                </p>
+
+            </div>
+
+
+            <div class="header-actions">
+
+                <button
+                    class="clear-btn"
+                    type="button"
+                    onclick="clearHistory()"
+                >
+                    Clear History
+                </button>
+
+
+                <a
+                    href="inspection.html"
+                    class="new-btn"
+                >
+                    + New Inspection
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= INFO ================= -->
+
+        <div class="info-bar">
+
+            Recent completed inspections are automatically
+            stored in your browser for this frontend session.
+            Backend/Supabase persistence remains handled by
+            the FastAPI server.
+
+        </div>
+
+
+        <!-- ================= STATISTICS ================= -->
+
+        <section class="stats">
+
+
+            <div class="stat-card">
+
+                <h3>
+                    Total Inspections
+                </h3>
+
+                <div
+                    class="stat-number"
+                    id="totalInspections"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <h3>
+                    Compliant
+                </h3>
+
+                <div
+                    class="stat-number"
+                    id="compliantCount"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <h3>
+                    Review Required
+                </h3>
+
+                <div
+                    class="stat-number"
+                    id="warningCount"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <h3>
+                    Non-Compliant
+                </h3>
+
+                <div
+                    class="stat-number"
+                    id="nonCompliantCount"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+        <!-- ================= HISTORY CARD ================= -->
+
+        <section class="history-card">
+
+
+            <div class="history-top">
+
+                <h2>
+                    Previous Inspections
+                </h2>
+
+
+                <input
+                    type="text"
+                    id="searchInput"
+                    class="search-box"
+                    placeholder="Search product, brand or scan ID..."
+                >
+
+            </div>
+
+
+            <!-- ================= FILTERS ================= -->
+
+            <div class="filters">
+
+                <button
+                    class="filter-btn active"
+                    onclick="filterStatus('all', this)"
+                >
+                    All
+                </button>
+
+
+                <button
+                    class="filter-btn"
+                    onclick="filterStatus('compliant', this)"
+                >
+                    Compliant
+                </button>
+
+
+                <button
+                    class="filter-btn"
+                    onclick="filterStatus('review_required', this)"
+                >
+                    Review Required
+                </button>
+
+
+                <button
+                    class="filter-btn"
+                    onclick="filterStatus('non_compliant', this)"
+                >
+                    Non-Compliant
+                </button>
+
+            </div>
+
+
+            <!-- ================= TABLE ================= -->
+
+            <div class="table-wrapper">
+
+                <table id="historyTable">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Product
+                            </th>
+
+                            <th>
+                                Category
+                            </th>
+
+                            <th>
+                                Manufacturer
+                            </th>
+
+                            <th>
+                                Date
+                            </th>
+
+                            <th>
+                                Score
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody
+                        id="historyBody"
+                    >
+
+                    </tbody>
+
+                </table>
+
+
+                <!-- EMPTY STATE -->
+
+                <div
+                    id="emptyState"
+                    class="empty-state"
+                    style="display: none;"
+                >
+
+                    <div class="empty-icon">
+                        📋
+                    </div>
+
+                    <h3>
+                        No inspections found
+                    </h3>
+
+                    <p>
+                        Run a product inspection from the
+                        Inspection page. Completed scans will
+                        appear here automatically.
+                    </p>
+
+                    <a
+                        href="inspection.html"
+                        class="new-btn"
+                    >
+                        Start Inspection
+                    </a>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <strong>
+            DocAI780
+        </strong>
+
+        |
+        AI-Based Packaged Commodity Compliance Checker
+
+        <br><br>
+
+        © 2026 DocAI780. All Rights Reserved.
+
+    </footer>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <script>
+
+        /* =========================================================
+           STORAGE KEY
+           ========================================================= */
+
+        const HISTORY_STORAGE_KEY =
+            "docai780_history";
+
+
+        /* =========================================================
+           CURRENT FILTER
+           ========================================================= */
+
+        let selectedStatus =
+            "all";
+
+
+        /* =========================================================
+           LOAD HISTORY
+           ========================================================= */
+
+        function loadHistory() {
+
+            try {
+
+                const stored =
+                    localStorage.getItem(
+                        HISTORY_STORAGE_KEY
+                    );
+
+
+                if (!stored) {
+                    return [];
+                }
+
+
+                const parsed =
+                    JSON.parse(stored);
+
+
+                if (!Array.isArray(parsed)) {
+                    return [];
+                }
+
+
+                return parsed;
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Failed to load history:",
+                    error
+                );
+
+                return [];
+
+            }
+
+        }
+
+
+        /* =========================================================
+           SAVE HISTORY
+           ========================================================= */
+
+        function saveHistory(history) {
+
+            try {
+
+                localStorage.setItem(
+                    HISTORY_STORAGE_KEY,
+                    JSON.stringify(history)
+                );
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Failed to save history:",
+                    error
+                );
+
+            }
+
+        }
+
+
+        /* =========================================================
+           IMPORT CURRENT SESSION RESULT
+           ========================================================= */
+
+        function importLatestScan() {
+
+            const savedResult =
+                sessionStorage.getItem(
+                    "lastScanResult"
+                );
+
+
+            if (!savedResult) {
+                return;
+            }
+
+
+            let result = null;
+
+
+            try {
+
+                result =
+                    JSON.parse(
+                        savedResult
+                    );
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Invalid latest scan result:",
+                    error
+                );
+
+                return;
+
+            }
+
+
+            if (
+                !result ||
+                !result.scan_id
+            ) {
+                return;
+            }
+
+
+            const history =
+                loadHistory();
+
+
+            const scanId =
+                String(
+                    result.scan_id
+                );
+
+
+            const alreadyExists =
+                history.some(
+                    item =>
+                        String(
+                            item.scan_id
+                        ) === scanId
+                );
+
+
+            if (alreadyExists) {
+                return;
+            }
+
+
+            const product =
+                result.product ||
+                {};
+
+
+            const fields =
+                result.extracted_fields ||
+                {};
+
+
+            const compliance =
+                result.compliance ||
+                {};
+
+
+            const productName =
+                product.name ||
+                fields.product_name?.value ||
+                "Unknown Product";
+
+
+            const brand =
+                product.brand ||
+                fields.brand?.value ||
+                "Not Detected";
+
+
+            const manufacturer =
+                fields.manufacturer?.raw ||
+                fields.manufacturer?.value ||
+                brand ||
+                "Not Detected";
+
+
+            const manualCategory =
+                sessionStorage.getItem(
+                    "manualCategory"
+                );
+
+
+            const category =
+                manualCategory ||
+                "Packaged Commodity";
+
+
+            const overallStatus =
+                compliance.overall_status ||
+                "REVIEW_REQUIRED";
+
+
+            const rules =
+                compliance.rule_results ||
+                [];
+
+
+            const applicableRules =
+                rules.filter(
+                    rule =>
+                        rule.status !==
+                        "NOT_APPLICABLE"
+                );
+
+
+            const passedRules =
+                applicableRules.filter(
+                    rule =>
+                        rule.status ===
+                        "PASS"
+                );
+
+
+            let score = 0;
+
+
+            if (
+                applicableRules.length > 0
+            ) {
+
+                score =
+                    Math.round(
+                        (
+                            passedRules.length /
+                            applicableRules.length
+                        ) * 100
+                    );
+
+            }
+
+
+            const historyItem = {
+
+                scan_id:
+                    scanId,
+
+                product:
+                    productName,
+
+                brand:
+                    brand,
+
+                category:
+                    category,
+
+                manufacturer:
+                    manufacturer,
+
+                score:
+                    score,
+
+                status:
+                    normalizeStatus(
+                        overallStatus
+                    ),
+
+                created_at:
+                    new Date().toISOString(),
+
+                result:
+                    result
+
+            };
+
+
+            history.unshift(
+                historyItem
+            );
+
+
+            saveHistory(
+                history
+            );
+
+        }
+
+
+        /* =========================================================
+           NORMALIZE STATUS
+           ========================================================= */
+
+        function normalizeStatus(
+            status
+        ) {
+
+            const normalized =
+                String(
+                    status || ""
+                )
+                    .trim()
+                    .toUpperCase();
+
+
+            if (
+                normalized ===
+                "PASS" ||
+                normalized ===
+                "COMPLIANT"
+            ) {
+
+                return "compliant";
+
+            }
+
+
+            if (
+                normalized ===
+                "NON_COMPLIANT"
+            ) {
+
+                return "non_compliant";
+
+            }
+
+
+            return "review_required";
+
+        }
+
+
+        /* =========================================================
+           STATUS DISPLAY
+           ========================================================= */
+
+        function statusLabel(
+            status
+        ) {
+
+            if (
+                status ===
+                "compliant"
+            ) {
+
+                return "Compliant";
+
+            }
+
+
+            if (
+                status ===
+                "non_compliant"
+            ) {
+
+                return "Non-Compliant";
+
+            }
+
+
+            return "Review Required";
+
+        }
+
+
+        function statusClass(
+            status
+        ) {
+
+            if (
+                status ===
+                "compliant"
+            ) {
+
+                return "compliant";
+
+            }
+
+
+            if (
+                status ===
+                "non_compliant"
+            ) {
+
+                return "non-compliant";
+
+            }
+
+
+            return "warning";
+
+        }
+
+
+        /* =========================================================
+           SCORE CLASS
+           ========================================================= */
+
+        function scoreClass(
+            score
+        ) {
+
+            if (
+                score >= 80
+            ) {
+
+                return "high-score";
+
+            }
+
+
+            if (
+                score >= 60
+            ) {
+
+                return "medium-score";
+
+            }
+
+
+            return "low-score";
+
+        }
+
+
+        /* =========================================================
+           FORMAT DATE
+           ========================================================= */
+
+        function formatDate(
+            value
+        ) {
+
+            if (!value) {
+                return "Not Available";
+            }
+
+
+            const date =
+                new Date(
+                    value
+                );
+
+
+            if (
+                Number.isNaN(
+                    date.getTime()
+                )
+            ) {
+
+                return "Not Available";
+
+            }
+
+
+            return date.toLocaleDateString(
+                "en-IN",
+                {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric"
+                }
+            );
+
+        }
+
+
+        /* =========================================================
+           ESCAPE HTML
+           ========================================================= */
+
+        function escapeHtml(
+            value
+        ) {
+
+            if (
+                value === null ||
+                value === undefined
+            ) {
+
+                return "";
+
+            }
+
+
+            return String(value)
+                .replace(
+                    /&/g,
+                    "&amp;"
+                )
+                .replace(
+                    /</g,
+                    "&lt;"
+                )
+                .replace(
+                    />/g,
+                    "&gt;"
+                )
+                .replace(
+                    /"/g,
+                    "&quot;"
+                )
+                .replace(
+                    /'/g,
+                    "&#039;"
+                );
+
+        }
+
+
+        /* =========================================================
+           UPDATE STATS
+           ========================================================= */
+
+        function updateStats(
+            history
+        ) {
+
+            const total =
+                history.length;
+
+
+            const compliant =
+                history.filter(
+                    item =>
+                        item.status ===
+                        "compliant"
+                ).length;
+
+
+            const reviewRequired =
+                history.filter(
+                    item =>
+                        item.status ===
+                        "review_required"
+                ).length;
+
+
+            const nonCompliant =
+                history.filter(
+                    item =>
+                        item.status ===
+                        "non_compliant"
+                ).length;
+
+
+            document.getElementById(
+                "totalInspections"
+            ).textContent =
+                total;
+
+
+            document.getElementById(
+                "compliantCount"
+            ).textContent =
+                compliant;
+
+
+            document.getElementById(
+                "warningCount"
+            ).textContent =
+                reviewRequired;
+
+
+            document.getElementById(
+                "nonCompliantCount"
+            ).textContent =
+                nonCompliant;
+
+        }
+
+
+        /* =========================================================
+           RENDER TABLE
+           ========================================================= */
+
+        function renderHistory() {
+
+            const history =
+                loadHistory();
+
+
+            const searchValue =
+                document.getElementById(
+                    "searchInput"
+                )
+                    .value
+                    .trim()
+                    .toLowerCase();
+
+
+            updateStats(
+                history
+            );
+
+
+            const filtered =
+                history.filter(
+                    item => {
+
+
+                        const searchableText =
+                            [
+
+                                item.product,
+
+                                item.brand,
+
+                                item.category,
+
+                                item.manufacturer,
+
+                                item.scan_id
+
+                            ]
+                                .join(" ")
+                                .toLowerCase();
+
+
+                        const matchesSearch =
+                            searchableText.includes(
+                                searchValue
+                            );
+
+
+                        const matchesStatus =
+                            selectedStatus ===
+                            "all" ||
+                            item.status ===
+                            selectedStatus;
+
+
+                        return (
+                            matchesSearch &&
+                            matchesStatus
+                        );
+
+                    }
+                );
+
+
+            const historyBody =
+                document.getElementById(
+                    "historyBody"
+                );
+
+
+            const emptyState =
+                document.getElementById(
+                    "emptyState"
+                );
+
+
+            if (
+                filtered.length === 0
+            ) {
+
+                historyBody.innerHTML =
+                    "";
+
+                emptyState.style.display =
+                    "block";
+
+                return;
+
+            }
+
+
+            emptyState.style.display =
+                "none";
+
+
+            historyBody.innerHTML =
+                filtered.map(
+                    item => {
+
+
+                        const status =
+                            normalizeStatus(
+                                item.status
+                            );
+
+
+                        const score =
+                            Number(
+                                item.score
+                            ) || 0;
+
+
+                        return `
+
+                            <tr>
+
+                                <td>
+
+                                    <div class="product-name">
+                                        ${escapeHtml(
+                                            item.product
+                                        )}
+                                    </div>
+
+                                    <div class="scan-id">
+                                        Scan ID:
+                                        ${escapeHtml(
+                                            item.scan_id
+                                        )}
+                                    </div>
+
+                                </td>
+
+
+                                <td>
+                                    ${escapeHtml(
+                                        item.category
+                                    )}
+                                </td>
+
+
+                                <td>
+                                    ${escapeHtml(
+                                        item.manufacturer
+                                    )}
+                                </td>
+
+
+                                <td class="date">
+                                    ${escapeHtml(
+                                        formatDate(
+                                            item.created_at
+                                        )
+                                    )}
+                                </td>
+
+
+                                <td
+                                    class="score ${scoreClass(
+                                        score
+                                    )}"
+                                >
+                                    ${score}%
+                                </td>
+
+
+                                <td>
+
+                                    <span
+                                        class="status ${statusClass(
+                                            status
+                                        )}"
+                                    >
+                                        ${statusLabel(
+                                            status
+                                        )}
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    <div class="actions">
+
+                                        <button
+                                            type="button"
+                                            class="action-btn"
+                                            onclick="viewInspection('${escapeHtml(
+                                                item.scan_id
+                                            )}')"
+                                        >
+                                            View
+                                        </button>
+
+
+                                        <a
+                                            href="report.html"
+                                            class="action-btn report-btn"
+                                        >
+                                            Report
+                                        </a>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        `;
+
+                    }
+                ).join("");
+
+        }
+
+
+        /* =========================================================
+           VIEW INSPECTION
+           ========================================================= */
+
+        function viewInspection(
+            scanId
+        ) {
+
+            const history =
+                loadHistory();
+
+
+            const item =
+                history.find(
+                    entry =>
+                        String(
+                            entry.scan_id
+                        ) ===
+                        String(
+                            scanId
+                        )
+                );
+
+
+            if (
+                !item ||
+                !item.result
+            ) {
+
+                alert(
+                    "Inspection result is not available in this browser session."
+                );
+
+                return;
+
+            }
+
+
+            sessionStorage.setItem(
+                "lastScanResult",
+                JSON.stringify(
+                    item.result
+                )
+            );
+
+
+            sessionStorage.setItem(
+                "lastScanId",
+                String(
+                    item.scan_id
+                )
+            );
+
+
+            window.location.href =
+                "result.html";
+
+        }
+
+
+        /* =========================================================
+           FILTER STATUS
+           ========================================================= */
+
+        function filterStatus(
+            status,
+            button
+        ) {
+
+            selectedStatus =
+                status;
+
+
+            document
+                .querySelectorAll(
+                    ".filter-btn"
+                )
+                .forEach(
+                    btn => {
+
+                        btn.classList.remove(
+                            "active"
+                        );
+
+                    }
+                );
+
+
+            button.classList.add(
+                "active"
+            );
+
+
+            renderHistory();
+
+        }
+
+
+        /* =========================================================
+           SEARCH
+           ========================================================= */
+
+        document
+            .getElementById(
+                "searchInput"
+            )
+            .addEventListener(
+                "input",
+                function () {
+
+                    renderHistory();
+
+                }
+            );
+
+
+        /* =========================================================
+           CLEAR HISTORY
+           ========================================================= */
+
+        function clearHistory() {
+
+            const history =
+                loadHistory();
+
+
+            if (
+                history.length === 0
+            ) {
+
+                alert(
+                    "There is no browser history to clear."
+                );
+
+                return;
+
+            }
+
+
+            const confirmed =
+                confirm(
+                    "Are you sure you want to clear the frontend history?"
+                );
+
+
+            if (!confirmed) {
+                return;
+            }
+
+
+            localStorage.removeItem(
+                HISTORY_STORAGE_KEY
+            );
+
+
+            renderHistory();
+
+        }
+
+
+        /* =========================================================
+           INITIALIZE PAGE
+           ========================================================= */
+
+        importLatestScan();
+
+        renderHistory();
+
+    </script>
+
+
+</body>
+
+</html>

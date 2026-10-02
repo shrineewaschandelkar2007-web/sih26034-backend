@@ -1,0 +1,2173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DocAI780 | Compliance Result</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f8ff;
+            color: #1d2739;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        header {
+            background: white;
+            height: 75px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 6%;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.06);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1769ff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            width: 35px;
+            height: 35px;
+            background: #1769ff;
+            color: white;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .logo span {
+            color: #1d2739;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #465166;
+            font-size: 14px;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #1769ff;
+        }
+
+        .nav-links .active {
+            color: #1769ff;
+            font-weight: bold;
+        }
+
+        .nav-button {
+            background: #1769ff;
+            color: white !important;
+            padding: 11px 18px;
+            border-radius: 8px;
+        }
+
+        /* ================= MAIN ================= */
+
+        .result-container {
+            width: 86%;
+            max-width: 1200px;
+            margin: 45px auto;
+        }
+
+        .page-heading {
+            margin-bottom: 30px;
+        }
+
+        .page-heading h1 {
+            font-size: 34px;
+            margin-bottom: 8px;
+        }
+
+        .page-heading p {
+            color: #687386;
+        }
+
+        /* ================= RESULT SUMMARY ================= */
+
+        .result-summary {
+            background: white;
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: 0 7px 25px rgba(0, 0, 0, 0.06);
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1fr;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 25px;
+        }
+
+        .product-name {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .product-category {
+            color: #687386;
+            font-size: 14px;
+        }
+
+        /* ================= STATUS ================= */
+
+        .status-section {
+            text-align: center;
+        }
+
+        .status-circle {
+            width: 95px;
+            height: 95px;
+            margin: 0 auto 12px;
+            border-radius: 50%;
+            background: #fff7df;
+            color: #d97706;
+            border: 8px solid #fef3c7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 35px;
+            transition: 0.3s;
+        }
+
+        .status-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #d97706;
+        }
+
+        .status-description {
+            font-size: 13px;
+            color: #687386;
+            margin-top: 5px;
+        }
+
+        /* ================= SCORE ================= */
+
+        .score-section {
+            text-align: center;
+        }
+
+        .score {
+            font-size: 42px;
+            font-weight: bold;
+            color: #1769ff;
+        }
+
+        .score-label {
+            color: #687386;
+            font-size: 13px;
+        }
+
+        .score-bar {
+            height: 8px;
+            background: #e7edf7;
+            border-radius: 20px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+
+        .score-fill {
+            width: 0%;
+            height: 100%;
+            background: #1769ff;
+            border-radius: 20px;
+            transition: width 0.5s ease;
+        }
+
+        /* ================= GRID ================= */
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 25px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 27px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .card h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* ================= CHECKS ================= */
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 17px 0;
+            border-bottom: 1px solid #edf0f5;
+        }
+
+        .check-item:last-child {
+            border-bottom: none;
+        }
+
+        .check-left {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+        }
+
+        .check-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .check-icon.pass {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .check-icon.warning {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .check-icon.fail {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .check-name {
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: capitalize;
+        }
+
+        .check-status {
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .pass-text {
+            color: #15803d;
+        }
+
+        .warning-text {
+            color: #b45309;
+        }
+
+        .fail-text {
+            color: #b91c1c;
+        }
+
+        /* ================= OCR DATA ================= */
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 13px 0;
+            border-bottom: 1px solid #edf0f5;
+        }
+
+        .data-row:last-child {
+            border-bottom: none;
+        }
+
+        .data-label {
+            color: #687386;
+            font-size: 13px;
+        }
+
+        .data-value {
+            font-size: 13px;
+            font-weight: bold;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        /* ================= AI FINDINGS ================= */
+
+        .finding {
+            padding: 15px;
+            border-radius: 9px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .finding:last-child {
+            margin-bottom: 0;
+        }
+
+        .finding.warning {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            color: #92400e;
+        }
+
+        .finding.success {
+            background: #f0fdf4;
+            border-left: 4px solid #22c55e;
+            color: #166534;
+        }
+
+        /* ================= ACTION BUTTONS ================= */
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .primary-button,
+        .secondary-button {
+            padding: 13px 22px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            border: none;
+        }
+
+        .primary-button {
+            background: #1769ff;
+            color: white;
+        }
+
+        .primary-button:hover {
+            background: #0d55d9;
+        }
+
+        .secondary-button {
+            background: #eef3fb;
+            color: #1769ff;
+        }
+
+        .secondary-button:hover {
+            background: #e1e9f8;
+        }
+
+        /* ================= FOOTER ================= */
+
+        footer {
+            background: #111827;
+            color: white;
+            margin-top: 60px;
+            padding: 35px 7%;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-logo {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        /* ================= EMPTY STATE ================= */
+
+        .empty-message {
+            color: #687386;
+            font-size: 13px;
+            line-height: 1.6;
+            padding: 10px 0;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 950px) {
+
+            .result-summary {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                gap: 10px;
+            }
+
+        }
+
+        @media (max-width: 650px) {
+
+            header {
+                height: auto;
+                padding: 15px 5%;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .result-container {
+                width: 92%;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .primary-button,
+            .secondary-button {
+                text-align: center;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- ================= NAVBAR ================= -->
+
+    <header>
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                ✓
+            </div>
+
+            <span>DocAI780</span>
+
+        </div>
+
+
+        <nav class="nav-links">
+
+            <a href="index.html">
+                Home
+            </a>
+
+            <a href="dashboard.html">
+                Dashboard
+            </a>
+
+            <a href="inspection.html">
+                Inspection
+            </a>
+
+            <a href="analysis.html">
+                Analysis
+            </a>
+
+            <a href="result.html" class="active">
+                Result
+            </a>
+
+            <a href="history.html">
+                History
+            </a>
+
+            <a href="report.html">
+                Reports
+            </a>
+
+            <a href="inspection.html" class="nav-button">
+                New Inspection
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="result-container">
+
+
+        <div class="page-heading">
+
+            <h1>
+                Compliance Result
+            </h1>
+
+            <p>
+                AI-powered analysis of your packaged commodity label.
+            </p>
+
+        </div>
+
+
+        <!-- ================= RESULT SUMMARY ================= -->
+
+        <section class="result-summary">
+
+
+            <!-- PRODUCT -->
+
+            <div>
+
+                <div
+                    class="product-name"
+                    id="productName"
+                >
+                    Loading...
+                </div>
+
+                <div
+                    class="product-category"
+                    id="productCategory"
+                >
+                    Loading...
+                </div>
+
+                <div
+                    class="product-category"
+                    id="manufacturer"
+                    style="margin-top: 6px;"
+                >
+                    Loading...
+                </div>
+
+                <div
+                    class="product-category"
+                    id="scanId"
+                    style="margin-top: 6px;"
+                >
+                    Scan ID: --
+                </div>
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <div class="status-section">
+
+                <div
+                    class="status-circle"
+                    id="statusCircle"
+                >
+                    !
+                </div>
+
+                <div
+                    class="status-title"
+                    id="statusTitle"
+                >
+                    LOADING
+                </div>
+
+                <div
+                    class="status-description"
+                    id="statusDescription"
+                >
+                    Loading compliance result...
+                </div>
+
+            </div>
+
+
+            <!-- SCORE -->
+
+            <div class="score-section">
+
+                <div
+                    class="score"
+                    id="scoreValue"
+                >
+                    --
+                </div>
+
+                <div class="score-label">
+                    Compliance Score
+                </div>
+
+                <div class="score-bar">
+
+                    <div
+                        class="score-fill"
+                        id="scoreFill"
+                    ></div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= CONTENT ================= -->
+
+        <section class="content-grid">
+
+
+            <!-- ================= COMPLIANCE CHECKS ================= -->
+
+            <div class="card">
+
+                <h2>
+                    Compliance Checks
+                </h2>
+
+
+                <div id="complianceChecks">
+
+                    <div class="empty-message">
+                        Loading compliance checks...
+                    </div>
+
+                </div>
+
+
+                <!-- ACTIONS -->
+
+                <div class="actions">
+
+                    <a
+                        href="report.html"
+                        class="primary-button"
+                    >
+                        📄 Generate Report
+                    </a>
+
+                    <a
+                        href="inspection.html"
+                        class="secondary-button"
+                    >
+                        + New Inspection
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= OCR INFORMATION ================= -->
+
+            <div class="card">
+
+                <h2>
+                    OCR Extracted Information
+                </h2>
+
+
+                <div id="ocrInformation">
+
+                    <div class="empty-message">
+                        Loading OCR information...
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= AI FINDINGS ================= -->
+
+        <section
+            class="card"
+            style="margin-top: 25px;"
+        >
+
+            <h2>
+                🤖 AI Compliance Findings
+            </h2>
+
+
+            <div id="aiFindings">
+
+                <div class="empty-message">
+                    Loading AI findings...
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <div class="footer-content">
+
+            <div class="footer-logo">
+                DocAI780
+            </div>
+
+
+            <div class="footer-links">
+
+                <a href="index.html">
+                    Home
+                </a>
+
+                <a href="dashboard.html">
+                    Dashboard
+                </a>
+
+                <a href="inspection.html">
+                    Inspection
+                </a>
+
+                <a href="result.html">
+                    Result
+                </a>
+
+                <a href="history.html">
+                    History
+                </a>
+
+                <a href="report.html">
+                    Reports
+                </a>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <script>
+
+        /* =========================================================
+           LOAD REAL BACKEND RESULT
+           ========================================================= */
+
+        const savedResult =
+            sessionStorage.getItem("lastScanResult");
+
+
+        const savedScanId =
+            sessionStorage.getItem("lastScanId");
+
+
+        /* =========================================================
+           DOM ELEMENTS
+           ========================================================= */
+
+        const productNameElement =
+            document.getElementById("productName");
+
+        const productCategoryElement =
+            document.getElementById("productCategory");
+
+        const manufacturerElement =
+            document.getElementById("manufacturer");
+
+        const scanIdElement =
+            document.getElementById("scanId");
+
+        const statusCircle =
+            document.getElementById("statusCircle");
+
+        const statusTitle =
+            document.getElementById("statusTitle");
+
+        const statusDescription =
+            document.getElementById("statusDescription");
+
+        const scoreValue =
+            document.getElementById("scoreValue");
+
+        const scoreFill =
+            document.getElementById("scoreFill");
+
+        const complianceChecks =
+            document.getElementById("complianceChecks");
+
+        const ocrInformation =
+            document.getElementById("ocrInformation");
+
+        const aiFindings =
+            document.getElementById("aiFindings");
+
+
+        /* =========================================================
+           HELPER FUNCTIONS
+           ========================================================= */
+
+        function escapeHtml(value) {
+
+            if (
+                value === null ||
+                value === undefined
+            ) {
+                return "Not Detected";
+            }
+
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+
+        function displayValue(value) {
+
+            if (
+                value === null ||
+                value === undefined ||
+                value === ""
+            ) {
+                return "Not Detected";
+            }
+
+            return String(value);
+        }
+
+
+        function getFieldValue(
+            extractedFields,
+            fieldName
+        ) {
+
+            const field =
+                extractedFields[fieldName];
+
+            if (!field) {
+                return null;
+            }
+
+            if (
+                field.value !== null &&
+                field.value !== undefined &&
+                field.value !== ""
+            ) {
+                return field.value;
+            }
+
+            if (
+                field.raw !== null &&
+                field.raw !== undefined &&
+                field.raw !== ""
+            ) {
+                return field.raw;
+            }
+
+            return null;
+        }
+
+
+        function getQuantity(
+            extractedFields
+        ) {
+
+            const quantity =
+                extractedFields.net_quantity;
+
+            if (!quantity) {
+                return "Not Detected";
+            }
+
+            if (
+                quantity.value !== null &&
+                quantity.value !== undefined
+            ) {
+
+                return (
+                    quantity.value +
+                    (
+                        quantity.unit
+                            ? " " + quantity.unit
+                            : ""
+                    )
+                );
+
+            }
+
+            return quantity.raw || "Not Detected";
+        }
+
+
+        /* =========================================================
+           STATUS STYLE
+           ========================================================= */
+
+        function setStatusStyle(
+            status
+        ) {
+
+            statusCircle.style.background =
+                "#fff7df";
+
+            statusCircle.style.color =
+                "#d97706";
+
+            statusCircle.style.borderColor =
+                "#fef3c7";
+
+            statusCircle.textContent =
+                "!";
+
+            statusTitle.style.color =
+                "#d97706";
+
+
+            if (status === "PASS") {
+
+                statusCircle.style.background =
+                    "#dcfce7";
+
+                statusCircle.style.color =
+                    "#15803d";
+
+                statusCircle.style.borderColor =
+                    "#bbf7d0";
+
+                statusCircle.textContent =
+                    "✓";
+
+                statusTitle.style.color =
+                    "#15803d";
+            }
+
+
+            else if (
+                status === "NON_COMPLIANT"
+            ) {
+
+                statusCircle.style.background =
+                    "#fee2e2";
+
+                statusCircle.style.color =
+                    "#b91c1c";
+
+                statusCircle.style.borderColor =
+                    "#fecaca";
+
+                statusCircle.textContent =
+                    "✕";
+
+                statusTitle.style.color =
+                    "#b91c1c";
+            }
+
+
+            else if (
+                status === "REVIEW_REQUIRED"
+            ) {
+
+                statusCircle.style.background =
+                    "#fff7df";
+
+                statusCircle.style.color =
+                    "#d97706";
+
+                statusCircle.style.borderColor =
+                    "#fef3c7";
+
+                statusCircle.textContent =
+                    "!";
+
+                statusTitle.style.color =
+                    "#d97706";
+            }
+
+        }
+
+
+        /* =========================================================
+           RULE STATUS HELPERS
+           ========================================================= */
+
+        function getCheckClass(
+            ruleStatus
+        ) {
+
+            if (ruleStatus === "PASS") {
+                return "pass";
+            }
+
+            if (ruleStatus === "FAIL") {
+                return "fail";
+            }
+
+            return "warning";
+        }
+
+
+        function getCheckIcon(
+            ruleStatus
+        ) {
+
+            if (ruleStatus === "PASS") {
+                return "✓";
+            }
+
+            if (ruleStatus === "FAIL") {
+                return "✕";
+            }
+
+            return "!";
+        }
+
+
+        function getCheckText(
+            ruleStatus
+        ) {
+
+            if (ruleStatus === "PASS") {
+                return "Passed";
+            }
+
+            if (ruleStatus === "FAIL") {
+                return "Failed";
+            }
+
+            if (
+                ruleStatus === "NOT_APPLICABLE"
+            ) {
+                return "N/A";
+            }
+
+            return "Review";
+        }
+
+
+        /* =========================================================
+           NO RESULT HANDLING
+           ========================================================= */
+
+        if (!savedResult) {
+
+            productNameElement.textContent =
+                "No Inspection Data";
+
+            productCategoryElement.textContent =
+                "Not Available";
+
+            manufacturerElement.textContent =
+                "Not Available";
+
+            scanIdElement.textContent =
+                "Scan ID: --";
+
+
+            statusTitle.textContent =
+                "NO RESULT";
+
+            statusDescription.textContent =
+                "Please run an inspection first.";
+
+            setStatusStyle(
+                "REVIEW_REQUIRED"
+            );
+
+
+            scoreValue.textContent =
+                "--";
+
+            scoreFill.style.width =
+                "0%";
+
+
+            complianceChecks.innerHTML = `
+                <div class="finding warning">
+
+                    <strong>
+                        ⚠ No inspection result found:
+                    </strong>
+
+                    Please return to the Inspection page
+                    and scan a packaged product.
+
+                </div>
+            `;
+
+
+            ocrInformation.innerHTML = `
+                <div class="finding warning">
+
+                    <strong>
+                        OCR data unavailable.
+                    </strong>
+
+                    No completed scan is currently loaded.
+
+                </div>
+            `;
+
+
+            aiFindings.innerHTML = `
+                <div class="finding warning">
+
+                    <strong>
+                        No AI analysis data available.
+                    </strong>
+
+                    Please run a new inspection.
+
+                </div>
+            `;
+
+        }
+
+
+        else {
+
+            let result = null;
+
+
+            /* =====================================================
+               PARSE SAVED RESULT
+               ===================================================== */
+
+            try {
+
+                result =
+                    JSON.parse(savedResult);
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Failed to parse saved scan result:",
+                    error
+                );
+
+
+                productNameElement.textContent =
+                    "Unable to Load";
+
+                productCategoryElement.textContent =
+                    "Error";
+
+                manufacturerElement.textContent =
+                    "Error";
+
+                scanIdElement.textContent =
+                    "Scan ID: --";
+
+
+                statusTitle.textContent =
+                    "ERROR";
+
+                statusDescription.textContent =
+                    "The inspection result could not be loaded.";
+
+                setStatusStyle(
+                    "REVIEW_REQUIRED"
+                );
+
+
+                scoreValue.textContent =
+                    "--";
+
+                scoreFill.style.width =
+                    "0%";
+
+
+                complianceChecks.innerHTML = `
+                    <div class="finding warning">
+
+                        <strong>
+                            ⚠ Result loading error:
+                        </strong>
+
+                        Please run the inspection again.
+
+                    </div>
+                `;
+
+                result = null;
+            }
+
+
+            /* =====================================================
+               PROCESS RESULT
+               ===================================================== */
+
+            if (result) {
+
+                console.log(
+                    "✅ Real backend result:",
+                    result
+                );
+
+
+                const product =
+                    result.product || {};
+
+                const fields =
+                    result.extracted_fields || {};
+
+                const compliance =
+                    result.compliance || {};
+
+                const barcode =
+                    result.barcode || {};
+
+                const tampering =
+                    result.tampering || {};
+
+                const ruleResults =
+                    compliance.rule_results || [];
+
+
+                /* =================================================
+                   PRODUCT DATA
+                   ================================================= */
+
+                const detectedProductName =
+                    product.name ||
+                    getFieldValue(
+                        fields,
+                        "product_name"
+                    ) ||
+                    "Unknown Product";
+
+
+                const detectedBrand =
+                    product.brand ||
+                    getFieldValue(
+                        fields,
+                        "brand"
+                    ) ||
+                    "Not Detected";
+
+
+                const detectedManufacturer =
+                    getFieldValue(
+                        fields,
+                        "manufacturer"
+                    ) ||
+                    detectedBrand ||
+                    "Not Detected";
+
+
+                const manualCategory =
+                    sessionStorage.getItem(
+                        "manualCategory"
+                    );
+
+
+                const finalScanId =
+                    result.scan_id ||
+                    savedScanId ||
+                    "--";
+
+
+                /* =================================================
+                   SUMMARY
+                   ================================================= */
+
+                productNameElement.textContent =
+                    detectedProductName;
+
+
+                productCategoryElement.textContent =
+                    manualCategory ||
+                    "Packaged Commodity";
+
+
+                manufacturerElement.textContent =
+                    detectedManufacturer;
+
+
+                scanIdElement.textContent =
+                    `Scan ID: ${finalScanId}`;
+
+
+                /* =================================================
+                   COMPLIANCE STATUS
+                   ================================================= */
+
+                const overallStatus =
+                    compliance.overall_status ||
+                    "REVIEW_REQUIRED";
+
+
+                if (
+                    overallStatus === "PASS"
+                ) {
+
+                    statusTitle.textContent =
+                        "COMPLIANT";
+
+                    statusDescription.textContent =
+                        "All applicable compliance checks passed.";
+
+                    setStatusStyle(
+                        "PASS"
+                    );
+
+                }
+
+
+                else if (
+                    overallStatus === "NON_COMPLIANT"
+                ) {
+
+                    statusTitle.textContent =
+                        "NON-COMPLIANT";
+
+                    statusDescription.textContent =
+                        "One or more high-risk compliance issues were detected.";
+
+                    setStatusStyle(
+                        "NON_COMPLIANT"
+                    );
+
+                }
+
+
+                else {
+
+                    statusTitle.textContent =
+                        "REVIEW REQUIRED";
+
+                    statusDescription.textContent =
+                        "Some checks require further review.";
+
+                    setStatusStyle(
+                        "REVIEW_REQUIRED"
+                    );
+
+                }
+
+
+                /* =================================================
+                   COMPLIANCE SCORE
+                   ================================================= */
+
+                const applicableRules =
+                    ruleResults.filter(
+                        rule =>
+                            rule.status !==
+                            "NOT_APPLICABLE"
+                    );
+
+
+                const passedRules =
+                    applicableRules.filter(
+                        rule =>
+                            rule.status ===
+                            "PASS"
+                    );
+
+
+                let score = 0;
+
+
+                if (
+                    applicableRules.length > 0
+                ) {
+
+                    score =
+                        Math.round(
+                            (
+                                passedRules.length /
+                                applicableRules.length
+                            ) * 100
+                        );
+
+                }
+
+
+                scoreValue.textContent =
+                    `${score}%`;
+
+
+                scoreFill.style.width =
+                    `${score}%`;
+
+
+                /* =================================================
+                   COMPLIANCE CHECKS
+                   ================================================= */
+
+                if (
+                    ruleResults.length === 0
+                ) {
+
+                    complianceChecks.innerHTML = `
+                        <div class="finding warning">
+
+                            No compliance rule results
+                            were returned by the backend.
+
+                        </div>
+                    `;
+
+                }
+
+
+                else {
+
+                    complianceChecks.innerHTML =
+                        ruleResults.map(
+                            rule => {
+
+                                const cssClass =
+                                    getCheckClass(
+                                        rule.status
+                                    );
+
+
+                                const icon =
+                                    getCheckIcon(
+                                        rule.status
+                                    );
+
+
+                                const statusText =
+                                    getCheckText(
+                                        rule.status
+                                    );
+
+
+                                const ruleName =
+                                    rule.field ||
+                                    rule.rule_id ||
+                                    "Compliance Rule";
+
+
+                                return `
+
+                                    <div class="check-item">
+
+                                        <div class="check-left">
+
+                                            <div class="check-icon ${cssClass}">
+                                                ${icon}
+                                            </div>
+
+                                            <div>
+
+                                                <div class="check-name">
+                                                    ${escapeHtml(
+                                                        ruleName
+                                                    )}
+                                                </div>
+
+                                                <div
+                                                    style="
+                                                        font-size:11px;
+                                                        color:#7b8494;
+                                                        margin-top:4px;
+                                                    "
+                                                >
+                                                    ${escapeHtml(
+                                                        rule.rule_id ||
+                                                        ""
+                                                    )}
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                        <div class="check-status ${cssClass}-text">
+                                            ${statusText}
+                                        </div>
+
+                                    </div>
+
+                                `;
+
+                            }
+                        ).join("");
+
+                }
+
+
+                /* =================================================
+                   OCR VALUES
+                   ================================================= */
+
+                const quantityValue =
+                    getQuantity(fields);
+
+
+                const mrpValue =
+                    getFieldValue(
+                        fields,
+                        "mrp"
+                    );
+
+
+                const batchValue =
+                    getFieldValue(
+                        fields,
+                        "batch_lot_number"
+                    );
+
+
+                const manufacturingDateValue =
+                    getFieldValue(
+                        fields,
+                        "manufacturing_date"
+                    );
+
+
+                const barcodeValue =
+                    barcode.found
+                        ? barcode.value
+                        : getFieldValue(
+                            fields,
+                            "barcode"
+                        );
+
+
+                const useByValue =
+                    getFieldValue(
+                        fields,
+                        "use_by"
+                    );
+
+
+                const customerCareValue =
+                    getFieldValue(
+                        fields,
+                        "consumer_care_contact"
+                    );
+
+
+                const ocrConfidence =
+                    result.ocr?.average_confidence;
+
+
+                /* =================================================
+                   OCR INFORMATION TABLE
+                   ================================================= */
+
+                ocrInformation.innerHTML = `
+
+                    <div class="data-row">
+
+                        <span class="data-label">
+                            Product
+                        </span>
+
+                        <span class="data-value">
+                            ${escapeHtml(
+                                detectedProductName
+                            )}
+                        </span>
+
+                    </div>
+
+
+                    <div class="data-row">
+
+                        <span class="data-label">
+                            Brand
+                        </span>
+
+                        <span class="data-value">
+                            ${escapeHtml(
+                                detectedBrand
+                            )}
+                        </span>
+
+                    </div>
+
+
+                    <div class="data-row">
+
+                        <span class="data-label">
+                            Category
+                        </span>
+
+                        <span class="data-value">
+                            ${escapeHtml(
+                                manualCategory ||
+                                "Packaged Commodity"
+                            )}
+                        </span>
+
+                    </div>
+
+
+                    <div class="data-row">
+
+                        <span class="data-label">
+                            Manufacturer
+                        </span>
+
+                        <span class="data-value">
+                            ${escapeHtml(
+                                detectedManufacturer
+                            )}
+                        </span>
+
+                    </div>
+
+
+                    <div class="data-row">
+
+                        <span class="data-label">
+                            Net Quantity
+                        </span>
+
+                        <span class="data-value">
+                            ${escapeHtml(
+                                quantityValue
+                            )}
+                        </span>
+
+                    </div>
+
+
+                    <div class="data-row">
+
+                        <span class="data-label">
+                            MRP
+                        </span>
+
+                        <span class="data-value">
+                            ${
+                                mrpValue !== null &&
+                                mrpValue !== undefined
+                                    ? "₹" +
+                                      escapeHtml(
+                                          mrpValue
+                                      )
+                                    : "Not Detected"
+                            }
+                        </span>
+
+                    </div>
+
+
+                    <div class="data-row">
+
+                        <span class="data-label">
+                            Batch / Lot No.
+                        </span>
+
+                        <span class="data-value">
+                            ${escapeHtml(
+                                batchValue
+                            )}
+                        </span>
+
+                    </div>
+
+
+                    <div class="data-row">
+
+                        <span class="data-label">
+                            Manufacturing Date
+                        </span>
+
+                        <span class="data-value">
+                            ${escapeHtml(
+                                manufacturingDateValue
+                            )}
+                        </span>
+
+                    </div>
+
+
+                    <div class="data-row">
+
+                        <span class="data-label">
+                            Use By
+                        </span>
+
+                        <span class="data-value">
+                            ${escapeHtml(
+                                useByValue
+                            )}
+                        </span>
+
+                    </div>
+
+
+                    <div class="data-row">
+
+                        <span class="data-label">
+                            Barcode
+                        </span>
+
+                        <span class="data-value">
+                            ${escapeHtml(
+                                barcodeValue
+                            )}
+                        </span>
+
+                    </div>
+
+
+                    <div class="data-row">
+
+                        <span class="data-label">
+                            Consumer Care
+                        </span>
+
+                        <span class="data-value">
+                            ${escapeHtml(
+                                customerCareValue
+                            )}
+                        </span>
+
+                    </div>
+
+
+                    <div class="data-row">
+
+                        <span class="data-label">
+                            OCR Confidence
+                        </span>
+
+                        <span class="data-value">
+                            ${
+                                ocrConfidence !== null &&
+                                ocrConfidence !== undefined
+                                    ? (
+                                        Number(
+                                            ocrConfidence
+                                        ) * 100
+                                      ).toFixed(1) + "%"
+                                    : "Not Available"
+                            }
+                        </span>
+
+                    </div>
+
+                `;
+
+
+                /* =================================================
+                   AI FINDINGS
+                   ================================================= */
+
+                const findings = [];
+
+
+                /* -------------------------------------------------
+                   Reference Product
+                   ------------------------------------------------- */
+
+                if (
+                    product.reference_found === true
+                ) {
+
+                    findings.push(`
+                        <div class="finding success">
+
+                            <strong>
+                                ✓ Reference Product:
+                            </strong>
+
+                            ${escapeHtml(
+                                detectedProductName
+                            )}
+                            was identified using
+                            ${escapeHtml(
+                                product.match_method ||
+                                "available evidence"
+                            )}.
+
+                        </div>
+                    `);
+
+                }
+
+                else {
+
+                    findings.push(`
+                        <div class="finding warning">
+
+                            <strong>
+                                ⚠ Reference Product:
+                            </strong>
+
+                            No matching reference product
+                            was found. Available OCR and
+                            compliance checks were still processed.
+
+                        </div>
+                    `);
+
+                }
+
+
+                /* -------------------------------------------------
+                   Barcode
+                   ------------------------------------------------- */
+
+                if (
+                    barcode.found === true
+                ) {
+
+                    findings.push(`
+                        <div class="finding success">
+
+                            <strong>
+                                ✓ Barcode Detection:
+                            </strong>
+
+                            ${escapeHtml(
+                                barcode.value
+                            )}
+                            detected successfully.
+
+                        </div>
+                    `);
+
+                }
+
+                else {
+
+                    findings.push(`
+                        <div class="finding warning">
+
+                            <strong>
+                                ⚠ Barcode Detection:
+                            </strong>
+
+                            No barcode was detected in
+                            the uploaded image.
+
+                        </div>
+                    `);
+
+                }
+
+
+                /* -------------------------------------------------
+                   Tampering
+                   ------------------------------------------------- */
+
+                if (
+                    tampering.status === "success" &&
+                    tampering.anomaly_detected === false
+                ) {
+
+                    findings.push(`
+                        <div class="finding success">
+
+                            <strong>
+                                ✓ Tampering Analysis:
+                            </strong>
+
+                            No significant anomaly detected.
+
+                        </div>
+                    `);
+
+                }
+
+                else {
+
+                    findings.push(`
+                        <div class="finding warning">
+
+                            <strong>
+                                ⚠ Tampering Analysis:
+                            </strong>
+
+                            Further review may be required.
+
+                        </div>
+                    `);
+
+                }
+
+
+                /* -------------------------------------------------
+                   Reference Comparison
+                   ------------------------------------------------- */
+
+                const matchedFields =
+                    compliance.matched_fields ||
+                    {};
+
+
+                const mismatchedFields =
+                    compliance.mismatched_fields ||
+                    {};
+
+
+                const matchedCount =
+                    Object.keys(
+                        matchedFields
+                    ).length;
+
+
+                const mismatchCount =
+                    Object.keys(
+                        mismatchedFields
+                    ).length;
+
+
+                if (
+                    matchedCount > 0
+                ) {
+
+                    findings.push(`
+                        <div class="finding success">
+
+                            <strong>
+                                ✓ Reference Comparison:
+                            </strong>
+
+                            ${matchedCount}
+                            field(s) matched the
+                            reference product.
+
+                        </div>
+                    `);
+
+                }
+
+
+                if (
+                    mismatchCount > 0
+                ) {
+
+                    findings.push(`
+                        <div class="finding warning">
+
+                            <strong>
+                                ⚠ Reference Comparison:
+                            </strong>
+
+                            ${mismatchCount}
+                            field(s) require review.
+
+                        </div>
+                    `);
+
+                }
+
+
+                /* -------------------------------------------------
+                   Risk Level
+                   ------------------------------------------------- */
+
+                const riskLevel =
+                    compliance.risk_level;
+
+
+                if (
+                    riskLevel &&
+                    riskLevel !== "NONE"
+                ) {
+
+                    findings.push(`
+                        <div class="finding warning">
+
+                            <strong>
+                                ⚠ Risk Level:
+                            </strong>
+
+                            ${escapeHtml(
+                                riskLevel
+                            )}
+
+                        </div>
+                    `);
+
+                }
+
+                else {
+
+                    findings.push(`
+                        <div class="finding success">
+
+                            <strong>
+                                ✓ Risk Level:
+                            </strong>
+
+                            No compliance risk was
+                            identified by the current rules.
+
+                        </div>
+                    `);
+
+                }
+
+
+                /* -------------------------------------------------
+                   Explanation
+                   ------------------------------------------------- */
+
+                if (
+                    compliance.explanation
+                ) {
+
+                    findings.push(`
+                        <div class="finding ${
+                            overallStatus === "PASS"
+                                ? "success"
+                                : "warning"
+                        }">
+
+                            <strong>
+                                AI Summary:
+                            </strong>
+
+                            ${escapeHtml(
+                                compliance.explanation
+                            )}
+
+                        </div>
+                    `);
+
+                }
+
+
+                /* -------------------------------------------------
+                   Warnings
+                   ------------------------------------------------- */
+
+                const warnings =
+                    result.warnings ||
+                    compliance.warnings ||
+                    [];
+
+
+                if (
+                    Array.isArray(warnings) &&
+                    warnings.length > 0
+                ) {
+
+                    warnings.forEach(
+                        warning => {
+
+                            findings.push(`
+                                <div class="finding warning">
+
+                                    <strong>
+                                        ⚠ Notice:
+                                    </strong>
+
+                                    ${escapeHtml(
+                                        warning
+                                    )}
+
+                                </div>
+                            `);
+
+                        }
+                    );
+
+                }
+
+
+                /* =================================================
+                   DISPLAY FINDINGS
+                   ================================================= */
+
+                aiFindings.innerHTML =
+                    findings.length > 0
+                        ? findings.join("")
+                        : `
+                            <div class="finding success">
+
+                                Analysis completed
+                                successfully.
+
+                            </div>
+                        `;
+
+
+                /* =================================================
+                   DEBUG INFORMATION
+                   ================================================= */
+
+                console.log(
+                    "Scan ID:",
+                    result.scan_id
+                );
+
+                console.log(
+                    "Compliance:",
+                    compliance.overall_status
+                );
+
+                console.log(
+                    "Risk Level:",
+                    compliance.risk_level
+                );
+
+                console.log(
+                    "Reference Found:",
+                    product.reference_found
+                );
+
+            }
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>

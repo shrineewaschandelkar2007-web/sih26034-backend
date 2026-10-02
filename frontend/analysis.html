@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DocAI780 | AI Analysis</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f8ff;
+            color: #1d2739;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        header {
+            background: white;
+            height: 75px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 6%;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.06);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1769ff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            width: 35px;
+            height: 35px;
+            background: #1769ff;
+            color: white;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .logo span {
+            color: #1d2739;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #465166;
+            font-size: 15px;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #1769ff;
+        }
+
+        .nav-links .active {
+            color: #1769ff;
+            font-weight: bold;
+        }
+
+        .nav-button {
+            background: #1769ff;
+            color: white !important;
+            padding: 11px 18px;
+            border-radius: 8px;
+        }
+
+        /* ================= MAIN ================= */
+
+        .analysis-container {
+            width: 86%;
+            max-width: 1100px;
+            margin: 55px auto;
+        }
+
+        .heading {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .heading h1 {
+            font-size: 34px;
+            margin-bottom: 12px;
+        }
+
+        .heading p {
+            color: #687386;
+            font-size: 16px;
+        }
+
+        /* ================= AI CARD ================= */
+
+        .analysis-card {
+            background: white;
+            border-radius: 18px;
+            padding: 40px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
+        }
+
+        .ai-animation {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .ai-circle {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: #eaf1ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1769ff;
+            font-size: 38px;
+            animation: pulse 1.8s infinite;
+        }
+
+        @keyframes pulse {
+
+            0% {
+                box-shadow: 0 0 0 0 rgba(23, 105, 255, 0.25);
+            }
+
+            70% {
+                box-shadow: 0 0 0 18px rgba(23, 105, 255, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(23, 105, 255, 0);
+            }
+
+        }
+
+        .analysis-title {
+            text-align: center;
+            font-size: 23px;
+            margin-bottom: 8px;
+        }
+
+        .analysis-subtitle {
+            text-align: center;
+            color: #687386;
+            margin-bottom: 35px;
+            font-size: 14px;
+        }
+
+        /* ================= PROGRESS ================= */
+
+        .progress-container {
+            margin: 25px 0 40px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #e7edf7;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: #1769ff;
+            border-radius: 20px;
+            transition: width 0.5s ease;
+        }
+
+        /* ================= STEPS ================= */
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .step {
+            border: 1px solid #e2e7ef;
+            border-radius: 12px;
+            padding: 20px 12px;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .step-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #edf2f9;
+            color: #8290a5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 20px;
+        }
+
+        .step h3 {
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .step p {
+            font-size: 12px;
+            color: #7b8494;
+        }
+
+        .step.active {
+            border-color: #1769ff;
+            background: #f5f8ff;
+        }
+
+        .step.active .step-icon {
+            background: #1769ff;
+            color: white;
+        }
+
+        .step.completed {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .step.completed .step-icon {
+            background: #22c55e;
+            color: white;
+        }
+
+        /* ================= PRODUCT INFO ================= */
+
+        .product-info {
+            margin-top: 35px;
+            padding: 20px;
+            background: #f8faff;
+            border-radius: 12px;
+            border: 1px solid #e4eaf3;
+        }
+
+        .product-info h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .info-item {
+            background: white;
+            padding: 13px;
+            border-radius: 8px;
+        }
+
+        .info-item span {
+            display: block;
+            font-size: 11px;
+            color: #7b8494;
+            margin-bottom: 5px;
+        }
+
+        .info-item strong {
+            font-size: 14px;
+        }
+
+        /* ================= STATUS ================= */
+
+        .status-message {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #687386;
+        }
+
+        /* ================= FOOTER ================= */
+
+        footer {
+            background: #111827;
+            color: white;
+            margin-top: 60px;
+            padding: 35px 7%;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-logo {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 900px) {
+
+            .steps {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                gap: 12px;
+            }
+
+        }
+
+        @media (max-width: 650px) {
+
+            header {
+                height: auto;
+                padding: 15px 5%;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .analysis-container {
+                width: 92%;
+            }
+
+            .analysis-card {
+                padding: 25px 18px;
+            }
+
+            .steps {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- ================= NAVBAR ================= -->
+
+    <header>
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                ✓
+            </div>
+
+            <span>DocAI780</span>
+
+        </div>
+
+
+        <nav class="nav-links">
+
+            <a href="index.html">
+                Home
+            </a>
+
+            <a href="dashboard.html">
+                Dashboard
+            </a>
+
+            <a href="inspection.html">
+                Inspection
+            </a>
+
+            <a href="analysis.html" class="active">
+                Analysis
+            </a>
+
+            <a href="result.html">
+                Result
+            </a>
+
+            <a href="history.html">
+                History
+            </a>
+
+            <a href="report.html">
+                Reports
+            </a>
+
+            <a href="inspection.html" class="nav-button">
+                Start Inspection
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="analysis-container">
+
+
+        <div class="heading">
+
+            <h1>
+                AI Compliance Analysis
+            </h1>
+
+            <p id="headingDescription">
+                DocAI780 is analyzing the uploaded product label.
+            </p>
+
+        </div>
+
+
+        <section class="analysis-card">
+
+
+            <!-- ================= AI ICON ================= -->
+
+            <div class="ai-animation">
+
+                <div class="ai-circle">
+                    🤖
+                </div>
+
+            </div>
+
+
+            <h2
+                class="analysis-title"
+                id="analysisTitle"
+            >
+                Analyzing Product Label
+            </h2>
+
+
+            <p
+                class="analysis-subtitle"
+                id="analysisSubtitle"
+            >
+                Please wait while DocAI780 processes the information.
+            </p>
+
+
+            <!-- ================= PROGRESS ================= -->
+
+            <div class="progress-container">
+
+                <div class="progress-info">
+
+                    <span id="progressText">
+                        Starting analysis...
+                    </span>
+
+                    <strong id="progressPercent">
+                        0%
+                    </strong>
+
+                </div>
+
+
+                <div class="progress-bar">
+
+                    <div
+                        class="progress-fill"
+                        id="progressFill"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= STEPS ================= -->
+
+            <div class="steps">
+
+
+                <div
+                    class="step active"
+                    id="step1"
+                >
+
+                    <div class="step-icon">
+                        📷
+                    </div>
+
+                    <h3>
+                        Image Processing
+                    </h3>
+
+                    <p>
+                        Reading uploaded image
+                    </p>
+
+                </div>
+
+
+                <div
+                    class="step"
+                    id="step2"
+                >
+
+                    <div class="step-icon">
+                        🔍
+                    </div>
+
+                    <h3>
+                        OCR Extraction
+                    </h3>
+
+                    <p>
+                        Extracting label text
+                    </p>
+
+                </div>
+
+
+                <div
+                    class="step"
+                    id="step3"
+                >
+
+                    <div class="step-icon">
+                        🤖
+                    </div>
+
+                    <h3>
+                        AI Compliance
+                    </h3>
+
+                    <p>
+                        Checking requirements
+                    </p>
+
+                </div>
+
+
+                <div
+                    class="step"
+                    id="step4"
+                >
+
+                    <div class="step-icon">
+                        ✓
+                    </div>
+
+                    <h3>
+                        Result
+                    </h3>
+
+                    <p>
+                        Preparing report
+                    </p>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- ================= PRODUCT INFO ================= -->
+
+            <div class="product-info">
+
+                <h3>
+                    Product Being Analyzed
+                </h3>
+
+
+                <div class="info-grid">
+
+
+                    <div class="info-item">
+
+                        <span>
+                            Product Name
+                        </span>
+
+                        <strong id="productName">
+                            Loading...
+                        </strong>
+
+                    </div>
+
+
+                    <div class="info-item">
+
+                        <span>
+                            Brand
+                        </span>
+
+                        <strong id="productBrand">
+                            Loading...
+                        </strong>
+
+                    </div>
+
+
+                    <div class="info-item">
+
+                        <span>
+                            Manufacturer
+                        </span>
+
+                        <strong id="manufacturer">
+                            Loading...
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= STATUS ================= -->
+
+            <div
+                class="status-message"
+                id="statusMessage"
+            >
+                AI analysis in progress...
+            </div>
+
+
+        </section>
+
+    </main>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <div class="footer-content">
+
+            <div class="footer-logo">
+                DocAI780
+            </div>
+
+
+            <div class="footer-links">
+
+                <a href="index.html">
+                    Home
+                </a>
+
+                <a href="dashboard.html">
+                    Dashboard
+                </a>
+
+                <a href="inspection.html">
+                    Inspection
+                </a>
+
+                <a href="history.html">
+                    History
+                </a>
+
+                <a href="report.html">
+                    Reports
+                </a>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <script>
+
+        /* =========================================================
+           LOAD REAL SCAN RESULT
+           ========================================================= */
+
+        const savedResult =
+            sessionStorage.getItem("lastScanResult");
+
+
+        const savedScanId =
+            sessionStorage.getItem("lastScanId");
+
+
+        /* =========================================================
+           DOM ELEMENTS
+           ========================================================= */
+
+        const progressFill =
+            document.getElementById("progressFill");
+
+        const progressPercent =
+            document.getElementById("progressPercent");
+
+        const progressText =
+            document.getElementById("progressText");
+
+        const statusMessage =
+            document.getElementById("statusMessage");
+
+        const title =
+            document.getElementById("analysisTitle");
+
+        const subtitle =
+            document.getElementById("analysisSubtitle");
+
+        const headingDescription =
+            document.getElementById("headingDescription");
+
+        const productNameElement =
+            document.getElementById("productName");
+
+        const productBrandElement =
+            document.getElementById("productBrand");
+
+        const manufacturerElement =
+            document.getElementById("manufacturer");
+
+
+        /* =========================================================
+           PROGRESS FUNCTION
+           ========================================================= */
+
+        function updateProgress(
+            value,
+            message
+        ) {
+
+            progressFill.style.width =
+                value + "%";
+
+            progressPercent.textContent =
+                value + "%";
+
+            progressText.textContent =
+                message;
+
+        }
+
+
+        /* =========================================================
+           STEP FUNCTION
+           ========================================================= */
+
+        function activateStep(
+            stepNumber
+        ) {
+
+            for (
+                let i = 1;
+                i <= 4;
+                i++
+            ) {
+
+                const step =
+                    document.getElementById(
+                        "step" + i
+                    );
+
+                step.classList.remove(
+                    "active",
+                    "completed"
+                );
+
+            }
+
+
+            for (
+                let i = 1;
+                i < stepNumber;
+                i++
+            ) {
+
+                document
+                    .getElementById(
+                        "step" + i
+                    )
+                    .classList.add(
+                        "completed"
+                    );
+
+            }
+
+
+            document
+                .getElementById(
+                    "step" + stepNumber
+                )
+                .classList.add(
+                    "active"
+                );
+
+        }
+
+
+        /* =========================================================
+           COMPLETE ALL STEPS
+           ========================================================= */
+
+        function completeAllSteps() {
+
+            for (
+                let i = 1;
+                i <= 4;
+                i++
+            ) {
+
+                const step =
+                    document.getElementById(
+                        "step" + i
+                    );
+
+                step.classList.remove(
+                    "active"
+                );
+
+                step.classList.add(
+                    "completed"
+                );
+
+            }
+
+        }
+
+
+        /* =========================================================
+           EMPTY RESULT HANDLING
+           ========================================================= */
+
+        if (!savedResult) {
+
+            title.textContent =
+                "No Inspection Data Found";
+
+            subtitle.textContent =
+                "Please return to the inspection page and upload a product image.";
+
+            headingDescription.textContent =
+                "No completed scan is currently available.";
+
+            statusMessage.textContent =
+                "No scan result found. Please start a new inspection.";
+
+            progressText.textContent =
+                "Waiting for inspection...";
+
+            progressPercent.textContent =
+                "0%";
+
+            progressFill.style.width =
+                "0%";
+
+            productNameElement.textContent =
+                "Unknown Product";
+
+            productBrandElement.textContent =
+                "Not Detected";
+
+            manufacturerElement.textContent =
+                "Not Detected";
+
+        }
+
+
+        else {
+
+            let scanResult = null;
+
+
+            /* =====================================================
+               PARSE SAVED JSON
+               ===================================================== */
+
+            try {
+
+                scanResult =
+                    JSON.parse(
+                        savedResult
+                    );
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Failed to parse scan result:",
+                    error
+                );
+
+
+                title.textContent =
+                    "Unable to Load Analysis";
+
+                subtitle.textContent =
+                    "The saved inspection result could not be read.";
+
+                headingDescription.textContent =
+                    "Please run the inspection again.";
+
+                statusMessage.textContent =
+                    "Invalid scan data.";
+
+                progressText.textContent =
+                    "Analysis unavailable.";
+
+                progressPercent.textContent =
+                    "0%";
+
+                progressFill.style.width =
+                    "0%";
+
+                productNameElement.textContent =
+                    "Unavailable";
+
+                productBrandElement.textContent =
+                    "Unavailable";
+
+                manufacturerElement.textContent =
+                    "Unavailable";
+
+            }
+
+
+            /* =====================================================
+               REAL SCAN PROCESS
+               ===================================================== */
+
+            if (scanResult) {
+
+                console.log(
+                    "✅ Analysis page received real backend result:",
+                    scanResult
+                );
+
+
+                /* =================================================
+                   EXTRACT DATA
+                   ================================================= */
+
+                const product =
+                    scanResult.product ||
+                    {};
+
+                const fields =
+                    scanResult.extracted_fields ||
+                    {};
+
+                const compliance =
+                    scanResult.compliance ||
+                    {};
+
+                const barcode =
+                    scanResult.barcode ||
+                    {};
+
+                const tampering =
+                    scanResult.tampering ||
+                    {};
+
+
+                /* =================================================
+                   PRODUCT INFORMATION
+                   ================================================= */
+
+                const productName =
+                    product.name ||
+                    fields.product_name?.value ||
+                    "Unknown Product";
+
+
+                const brand =
+                    product.brand ||
+                    fields.brand?.value ||
+                    "Not Detected";
+
+
+                const manufacturer =
+                    fields.manufacturer?.raw ||
+                    fields.manufacturer?.value ||
+                    brand ||
+                    "Not Detected";
+
+
+                productNameElement.textContent =
+                    productName;
+
+
+                productBrandElement.textContent =
+                    brand;
+
+
+                manufacturerElement.textContent =
+                    manufacturer;
+
+
+                /* =================================================
+                   SCAN ID
+                   ================================================= */
+
+                const scanId =
+                    scanResult.scan_id ||
+                    savedScanId ||
+                    "N/A";
+
+
+                /* =================================================
+                   INITIAL STATE
+                   ================================================= */
+
+                activateStep(1);
+
+                updateProgress(
+                    15,
+                    "Product image received successfully."
+                );
+
+
+                statusMessage.textContent =
+                    `Scan ID: ${scanId} • Initializing analysis...`;
+
+
+                /* =================================================
+                   STEP 1
+                   ================================================= */
+
+                setTimeout(
+                    function () {
+
+                        activateStep(1);
+
+                        updateProgress(
+                            25,
+                            "Image processing completed."
+                        );
+
+                        statusMessage.textContent =
+                            `Scan ID: ${scanId} • Image processing completed.`;
+
+                    },
+                    400
+                );
+
+
+                /* =================================================
+                   STEP 2 — OCR
+                   ================================================= */
+
+                setTimeout(
+                    function () {
+
+                        activateStep(2);
+
+
+                        if (
+                            scanResult.ocr?.status ===
+                            "success"
+                        ) {
+
+                            updateProgress(
+                                50,
+                                "OCR extraction completed successfully."
+                            );
+
+                            statusMessage.textContent =
+                                `Scan ID: ${scanId} • OCR extraction completed.`;
+
+                        }
+
+                        else {
+
+                            updateProgress(
+                                50,
+                                "OCR completed with limited extraction."
+                            );
+
+                            statusMessage.textContent =
+                                `Scan ID: ${scanId} • OCR completed with limited data.`;
+
+                        }
+
+                    },
+                    900
+                );
+
+
+                /* =================================================
+                   STEP 3 — AI ANALYSIS
+                   ================================================= */
+
+                setTimeout(
+                    function () {
+
+                        activateStep(3);
+
+
+                        const barcodeFound =
+                            barcode.found === true;
+
+
+                        const referenceFound =
+                            product.reference_found === true;
+
+
+                        const tamperingAvailable =
+                            tampering.status ===
+                            "success";
+
+
+                        let analysisMessage =
+                            "AI compliance analysis completed.";
+
+
+                        if (
+                            barcodeFound &&
+                            referenceFound &&
+                            tamperingAvailable
+                        ) {
+
+                            analysisMessage =
+                                "Barcode, reference matching and tampering analysis completed.";
+
+                        }
+
+                        else if (
+                            referenceFound
+                        ) {
+
+                            analysisMessage =
+                                "Reference product analysis completed.";
+
+                        }
+
+                        else {
+
+                            analysisMessage =
+                                "Available AI analysis completed.";
+
+                        }
+
+
+                        updateProgress(
+                            75,
+                            analysisMessage
+                        );
+
+
+                        statusMessage.textContent =
+                            `Scan ID: ${scanId} • ${analysisMessage}`;
+
+                    },
+                    1400
+                );
+
+
+                /* =================================================
+                   STEP 4 — COMPLIANCE RESULT
+                   ================================================= */
+
+                setTimeout(
+                    function () {
+
+                        activateStep(4);
+
+
+                        const backendStatus =
+                            compliance.overall_status ||
+                            "REVIEW_REQUIRED";
+
+
+                        if (
+                            backendStatus ===
+                            "PASS"
+                        ) {
+
+                            updateProgress(
+                                95,
+                                "Compliance checks passed. Preparing result..."
+                            );
+
+                        }
+
+                        else if (
+                            backendStatus ===
+                            "NON_COMPLIANT"
+                        ) {
+
+                            updateProgress(
+                                95,
+                                "Compliance issues detected. Preparing result..."
+                            );
+
+                        }
+
+                        else {
+
+                            updateProgress(
+                                95,
+                                "Preparing compliance result..."
+                            );
+
+                        }
+
+
+                        statusMessage.textContent =
+                            `Scan ID: ${scanId} • Compliance evaluation completed.`;
+
+                    },
+                    1900
+                );
+
+
+                /* =================================================
+                   FINISHED
+                   ================================================= */
+
+                setTimeout(
+                    function () {
+
+                        updateProgress(
+                            100,
+                            "Analysis completed successfully."
+                        );
+
+
+                        completeAllSteps();
+
+
+                        title.textContent =
+                            "Analysis Completed ✓";
+
+
+                        subtitle.textContent =
+                            "Your product compliance result is ready.";
+
+
+                        headingDescription.textContent =
+                            "All available AI inspection stages have been completed.";
+
+
+                        statusMessage.textContent =
+                            `Scan ID: ${scanId} • Redirecting to compliance result...`;
+
+                    },
+                    2400
+                );
+
+
+                /* =================================================
+                   REDIRECT TO RESULT PAGE
+                   ================================================= */
+
+                setTimeout(
+                    function () {
+
+                        window.location.href =
+                            "result.html";
+
+                    },
+                    3300
+                );
+
+            }
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>

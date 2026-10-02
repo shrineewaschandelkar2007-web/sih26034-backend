@@ -1,0 +1,18 @@
+[project]
+name = "sih26034-backend"
+version = "0.1.0"
+description = "AI-powered packaged commodity compliance backend (SIH26034)"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+filterwarnings = ["ignore::DeprecationWarning", "ignore::UserWarning"]
+
+[tool.ruff]
+line-length = 140
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["B008"]  # FastAPI's Depends()/File() in argument defaults is idiomatic

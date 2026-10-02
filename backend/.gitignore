@@ -1,0 +1,13 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+local_storage/
+openapi.json
+*.db
+.DS_Store
+# downloaded model weights (PaddleOCR caches under ~/.paddlex by default)
+models_data/*/weights/

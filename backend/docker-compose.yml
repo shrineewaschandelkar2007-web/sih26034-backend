@@ -1,0 +1,20 @@
+services:
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - models-cache:/models-cache      # PaddleOCR weights survive restarts
+      - ./local_storage:/app/local_storage
+
+  # Optional, NOT included: a separate container running the legacy ManTraNet stack (Keras 2.2 / TF 1.8).
+  # If you build one, expose POST /predict, then set TAMPERING_SERVICE_MODE=mantranet_remote and
+  # TAMPERING_REMOTE_URL=http://tampering:5000/predict. See README.
+  # tampering:
+  #   build: ./tampering_service
+  #   expose: ["5000"]
+
+volumes:
+  models-cache:

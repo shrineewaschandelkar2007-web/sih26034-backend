@@ -1,0 +1,33 @@
+# Versions below are the ones this backend was actually run and tested against (Python 3.12).
+# Re-pin from `pip freeze` if you upgrade, and rerun `pytest` + `python scripts/smoke_test.py --inprocess`.
+
+# --- API ---
+fastapi==0.141.1
+uvicorn[standard]==0.54.0
+pydantic==2.13.5
+pydantic-settings==2.15.0
+python-multipart==0.0.32
+
+# --- Image / vision ---
+pillow==12.1.1
+numpy==2.3.5
+opencv-python-headless==4.13.0.92
+
+# --- OCR (PaddleOCR 3.x + PaddlePaddle CPU). Downloads model weights on first use: needs internet once. ---
+paddlepaddle==3.3.1
+paddleocr==3.7.0
+
+# --- Barcode. pyzbar is only a wrapper: it also needs the system library (apt: libzbar0, brew: zbar). ---
+pyzbar==0.1.9
+
+# --- Supabase (Postgres + Storage) ---
+supabase==2.31.0
+
+# --- Only used by TAMPERING_SERVICE_MODE=mantranet_remote ---
+requests==2.33.1
+
+# --- Dev / test ---
+pytest==9.1.1
+httpx==0.28.1
+ruff==0.16.9
+python-barcode==0.16.1   # only to regenerate the test fixture images

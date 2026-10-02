@@ -1,0 +1,2498 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DocAI780 | Compliance Report</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f8ff;
+            color: #1d2739;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        header {
+            background: white;
+            height: 75px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 6%;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1769ff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            width: 35px;
+            height: 35px;
+            background: #1769ff;
+            color: white;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .logo span {
+            color: #1d2739;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #465166;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: #1769ff;
+        }
+
+        .nav-links .active {
+            color: #1769ff;
+            font-weight: bold;
+        }
+
+        .nav-button {
+            background: #1769ff;
+            color: white !important;
+            padding: 11px 18px;
+            border-radius: 8px;
+        }
+
+        /* ================= MAIN ================= */
+
+        .report-container {
+            width: 86%;
+            max-width: 1100px;
+            margin: 45px auto;
+        }
+
+        .page-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-heading h1 {
+            font-size: 34px;
+            margin-bottom: 8px;
+        }
+
+        .page-heading p {
+            color: #687386;
+        }
+
+        /* ================= BUTTONS ================= */
+
+        .top-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .button {
+            border: none;
+            padding: 12px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .print-button {
+            background: #1769ff;
+            color: white;
+        }
+
+        .new-button {
+            background: #eaf1ff;
+            color: #1769ff;
+        }
+
+        .button:hover {
+            opacity: 0.9;
+        }
+
+        /* ================= REPORT ================= */
+
+        .report-card {
+            background: white;
+            border-radius: 16px;
+            padding: 35px;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.06);
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid #edf0f5;
+            padding-bottom: 25px;
+            margin-bottom: 25px;
+        }
+
+        .report-logo {
+            font-size: 26px;
+            font-weight: bold;
+            color: #1769ff;
+        }
+
+        .report-title {
+            text-align: right;
+        }
+
+        .report-title h2 {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .report-title p {
+            font-size: 13px;
+            color: #687386;
+            margin-top: 4px;
+        }
+
+        /* ================= PRODUCT DETAILS ================= */
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #edf0f5;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .detail-box {
+            background: #f8faff;
+            border: 1px solid #e4e9f1;
+            border-radius: 9px;
+            padding: 15px;
+        }
+
+        .detail-box span {
+            display: block;
+            color: #7b8494;
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+
+        .detail-box strong {
+            font-size: 14px;
+            word-break: break-word;
+        }
+
+        /* ================= SCORE ================= */
+
+        .score-area {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            align-items: center;
+            background: #f8faff;
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        .score-circle {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background: #eef4ff;
+            border: 10px solid #1769ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: auto;
+        }
+
+        .score-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1769ff;
+        }
+
+        .score-label {
+            font-size: 11px;
+            color: #687386;
+        }
+
+        .score-description h3 {
+            margin-bottom: 10px;
+        }
+
+        .score-description p {
+            color: #687386;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* ================= CHECK TABLE ================= */
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+        th {
+            text-align: left;
+            background: #f5f8ff;
+            padding: 13px;
+            font-size: 13px;
+            color: #596579;
+        }
+
+        td {
+            padding: 15px 13px;
+            border-bottom: 1px solid #edf0f5;
+            font-size: 13px;
+            vertical-align: top;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .passed {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .warning {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .failed {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        /* ================= FINDINGS ================= */
+
+        .finding {
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 9px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .finding.success {
+            background: #f0fdf4;
+            border-left: 4px solid #22c55e;
+        }
+
+        .finding.warning-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .finding.danger {
+            background: #fef2f2;
+            border-left: 4px solid #ef4444;
+        }
+
+        /* ================= SUMMARY ================= */
+
+        .summary {
+            background: #f8faff;
+            border-radius: 10px;
+            padding: 20px;
+            line-height: 1.7;
+            color: #596579;
+            font-size: 14px;
+        }
+
+        /* ================= FOOTER ================= */
+
+        footer {
+            background: #111827;
+            color: white;
+            margin-top: 60px;
+            padding: 35px 7%;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-logo {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        /* ================= ERROR ================= */
+
+        .error-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            display: none;
+            line-height: 1.6;
+        }
+
+        /* ================= PRINT ================= */
+
+        @media print {
+
+            body {
+                background: white;
+            }
+
+            header,
+            footer,
+            .top-actions {
+                display: none;
+            }
+
+            .report-container {
+                width: 100%;
+                margin: 0;
+                max-width: none;
+            }
+
+            .report-card {
+                box-shadow: none;
+                border-radius: 0;
+                padding: 20px;
+            }
+
+            .section {
+                break-inside: avoid;
+            }
+
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 900px) {
+
+            header {
+                height: auto;
+                padding: 15px 5%;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .page-heading {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+
+            .score-area {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media (max-width: 650px) {
+
+            .report-container {
+                width: 92%;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .report-header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .report-title {
+                text-align: left;
+            }
+
+            .top-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .button {
+                text-align: center;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- ================= NAVBAR ================= -->
+
+    <header>
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                ✓
+            </div>
+
+            <span>DocAI780</span>
+
+        </div>
+
+
+        <nav class="nav-links">
+
+            <a href="index.html">
+                Home
+            </a>
+
+            <a href="dashboard.html">
+                Dashboard
+            </a>
+
+            <a href="inspection.html">
+                Inspection
+            </a>
+
+            <a href="analysis.html">
+                Analysis
+            </a>
+
+            <a href="result.html">
+                Result
+            </a>
+
+            <a href="history.html">
+                History
+            </a>
+
+            <a href="report.html" class="active">
+                Reports
+            </a>
+
+            <a href="inspection.html" class="nav-button">
+                New Inspection
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="report-container">
+
+
+        <!-- PAGE HEADING -->
+
+        <div class="page-heading">
+
+            <div>
+
+                <h1>
+                    Compliance Report
+                </h1>
+
+                <p>
+                    Detailed AI-generated product compliance report.
+                </p>
+
+            </div>
+
+
+            <div class="top-actions">
+
+                <button
+                    class="button print-button"
+                    onclick="window.print()"
+                >
+                    🖨️ Print / Save PDF
+                </button>
+
+
+                <a
+                    href="inspection.html"
+                    class="button new-button"
+                >
+                    + New Inspection
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- ERROR MESSAGE -->
+
+        <div class="error-box" id="errorBox">
+            No scan result is currently available.
+            Please perform an inspection first and then open the report.
+        </div>
+
+
+        <!-- ================= REPORT CARD ================= -->
+
+        <section class="report-card">
+
+
+            <!-- REPORT HEADER -->
+
+            <div class="report-header">
+
+                <div>
+
+                    <div class="report-logo">
+                        DocAI780
+                    </div>
+
+                    <p style="color:#687386; margin-top:6px;">
+                        AI-Based Packaged Commodity Compliance Checker
+                    </p>
+
+                </div>
+
+
+                <div class="report-title">
+
+                    <h2>
+                        COMPLIANCE REPORT
+                    </h2>
+
+                    <p>
+                        Report ID:
+                        <strong id="reportId">
+                            DOC-780-001
+                        </strong>
+                    </p>
+
+                    <p>
+                        Scan ID:
+                        <strong id="scanId">
+                            --
+                        </strong>
+                    </p>
+
+                    <p>
+                        Date:
+                        <strong id="reportDate">
+                            --
+                        </strong>
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= PRODUCT INFORMATION ================= -->
+
+            <section class="section">
+
+                <h2 class="section-title">
+                    1. Product Information
+                </h2>
+
+
+                <div class="details-grid">
+
+                    <div class="detail-box">
+
+                        <span>
+                            Product Name
+                        </span>
+
+                        <strong id="productName">
+                            Loading...
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            Product Category
+                        </span>
+
+                        <strong id="category">
+                            Loading...
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            Manufacturer / Brand
+                        </span>
+
+                        <strong id="manufacturer">
+                            Loading...
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            Barcode
+                        </span>
+
+                        <strong id="barcode">
+                            --
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            Inspection Type
+                        </span>
+
+                        <strong>
+                            AI Label Compliance Inspection
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            Reference Match
+                        </span>
+
+                        <strong id="referenceMatch">
+                            --
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================= SCORE ================= -->
+
+            <section class="section">
+
+                <h2 class="section-title">
+                    2. Compliance Assessment
+                </h2>
+
+
+                <div class="score-area">
+
+                    <div>
+
+                        <div class="score-circle">
+
+                            <div
+                                class="score-number"
+                                id="scoreNumber"
+                            >
+                                --%
+                            </div>
+
+                            <div class="score-label">
+                                Compliance
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="score-description">
+
+                        <h3 id="statusHeading">
+                            Compliance Status: Loading...
+                        </h3>
+
+                        <p id="statusDescription">
+                            Loading AI compliance assessment...
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================= COMPLIANCE CHECKS ================= -->
+
+            <section class="section">
+
+                <h2 class="section-title">
+                    3. Compliance Checks
+                </h2>
+
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Requirement
+                                </th>
+
+                                <th>
+                                    Detected
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Remarks
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="complianceTableBody">
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================= AI FINDINGS ================= -->
+
+            <section class="section">
+
+                <h2 class="section-title">
+                    4. AI Findings
+                </h2>
+
+
+                <div id="findingsContainer">
+
+                </div>
+
+            </section>
+
+
+            <!-- ================= EXTRACTED INFORMATION ================= -->
+
+            <section class="section">
+
+                <h2 class="section-title">
+                    5. Extracted Label Information
+                </h2>
+
+
+                <div class="details-grid">
+
+                    <div class="detail-box">
+
+                        <span>
+                            MRP
+                        </span>
+
+                        <strong id="mrp">
+                            --
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            Net Quantity
+                        </span>
+
+                        <strong id="netQuantity">
+                            --
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            Manufacturing Date
+                        </span>
+
+                        <strong id="manufacturingDate">
+                            --
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            Packing Date
+                        </span>
+
+                        <strong id="packingDate">
+                            --
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            Best Before
+                        </span>
+
+                        <strong id="bestBefore">
+                            --
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            Use By
+                        </span>
+
+                        <strong id="useBy">
+                            --
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            Consumer Care
+                        </span>
+
+                        <strong id="consumerCare">
+                            --
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            OCR Confidence
+                        </span>
+
+                        <strong id="ocrConfidence">
+                            --
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            Tampering Status
+                        </span>
+
+                        <strong id="tamperingStatus">
+                            --
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            Risk Level
+                        </span>
+
+                        <strong id="riskLevel">
+                            --
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================= SUMMARY ================= -->
+
+            <section class="section">
+
+                <h2 class="section-title">
+                    6. Inspection Summary
+                </h2>
+
+
+                <div class="summary" id="summaryText">
+
+                    Loading inspection summary...
+
+                </div>
+
+            </section>
+
+
+            <!-- ================= REPORT FOOTER ================= -->
+
+            <div style="
+                border-top:1px solid #edf0f5;
+                padding-top:20px;
+                color:#7b8494;
+                font-size:12px;
+                text-align:center;
+            ">
+
+                Generated by
+                <strong>DocAI780</strong>
+                • AI-Based Packaged Commodity Compliance Checker
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <div class="footer-content">
+
+            <div class="footer-logo">
+                DocAI780
+            </div>
+
+
+            <div class="footer-links">
+
+                <a href="index.html">
+                    Home
+                </a>
+
+                <a href="dashboard.html">
+                    Dashboard
+                </a>
+
+                <a href="inspection.html">
+                    Inspection
+                </a>
+
+                <a href="result.html">
+                    Result
+                </a>
+
+                <a href="history.html">
+                    History
+                </a>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <script>
+
+        /* =========================================================
+           DOCIAI780 - REAL BACKEND REPORT DATA
+           ========================================================= */
+
+        const rawResult =
+            sessionStorage.getItem("lastScanResult");
+
+        const lastScanId =
+            sessionStorage.getItem("lastScanId");
+
+
+        const manualCategory =
+            sessionStorage.getItem("manualCategory")
+            || "Food & Beverages";
+
+
+        const manualProductName =
+            sessionStorage.getItem("manualProductName")
+            || "";
+
+
+        const manualManufacturer =
+            sessionStorage.getItem("manualManufacturer")
+            || "";
+
+
+        /* =========================================================
+           GENERAL HELPERS
+           ========================================================= */
+
+        function safe(value, fallback = "--") {
+
+            if (
+                value === null ||
+                value === undefined ||
+                value === ""
+            ) {
+                return fallback;
+            }
+
+            if (
+                typeof value === "object"
+            ) {
+                return fallback;
+            }
+
+            return String(value);
+
+        }
+
+
+        function unwrapField(field, fallback = "--") {
+
+            if (
+                field === null ||
+                field === undefined
+            ) {
+                return fallback;
+            }
+
+
+            if (
+                typeof field === "object"
+            ) {
+
+                if (
+                    field.value !== null &&
+                    field.value !== undefined &&
+                    field.value !== ""
+                ) {
+                    return field.value;
+                }
+
+
+                if (
+                    field.raw !== null &&
+                    field.raw !== undefined &&
+                    field.raw !== ""
+                ) {
+                    return field.raw;
+                }
+
+
+                return fallback;
+
+            }
+
+
+            return field;
+
+        }
+
+
+        function fieldFound(field) {
+
+            if (!field) {
+                return false;
+            }
+
+
+            if (
+                typeof field === "object" &&
+                typeof field.found === "boolean"
+            ) {
+                return field.found;
+            }
+
+
+            return (
+                field !== null &&
+                field !== undefined &&
+                field !== ""
+            );
+
+        }
+
+
+        function displayDate(value, fallback = "Not detected") {
+
+            const unwrapped =
+                unwrapField(value, null);
+
+
+            if (
+                unwrapped === null ||
+                unwrapped === undefined ||
+                unwrapped === ""
+            ) {
+                return fallback;
+            }
+
+
+            const text =
+                String(unwrapped);
+
+
+            /* ISO date: 2025-10-04 */
+
+            if (
+                /^\d{4}-\d{2}-\d{2}$/.test(text)
+            ) {
+
+                const parts =
+                    text.split("-");
+
+
+                const date =
+                    new Date(
+                        Number(parts[0]),
+                        Number(parts[1]) - 1,
+                        Number(parts[2])
+                    );
+
+
+                return date.toLocaleDateString(
+                    "en-IN",
+                    {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric"
+                    }
+                );
+
+            }
+
+
+            /* Already OCR-style date */
+
+            return text;
+
+        }
+
+
+        function formatPercent(value) {
+
+            if (
+                value === null ||
+                value === undefined ||
+                value === ""
+            ) {
+                return "--";
+            }
+
+
+            const number =
+                Number(value);
+
+
+            if (isNaN(number)) {
+                return "--";
+            }
+
+
+            return number.toFixed(1) + "%";
+
+        }
+
+
+        /* =========================================================
+           STATUS HELPERS
+           ========================================================= */
+
+        function normalizeStatus(status) {
+
+            const value =
+                String(status || "")
+                    .trim()
+                    .toUpperCase();
+
+
+            if (
+                value === "PASS" ||
+                value === "COMPLIANT"
+            ) {
+                return "compliant";
+            }
+
+
+            if (
+                value === "NON_COMPLIANT" ||
+                value === "NON-COMPLIANT"
+            ) {
+                return "non_compliant";
+            }
+
+
+            if (
+                value === "REVIEW_REQUIRED" ||
+                value === "REVIEW REQUIRED"
+            ) {
+                return "review_required";
+            }
+
+
+            if (value === "FAILED") {
+                return "failed";
+            }
+
+
+            return "review_required";
+
+        }
+
+
+        function displayStatus(status) {
+
+            const normalized =
+                normalizeStatus(status);
+
+
+            if (normalized === "compliant") {
+                return "COMPLIANT";
+            }
+
+
+            if (normalized === "non_compliant") {
+                return "NON-COMPLIANT";
+            }
+
+
+            if (normalized === "failed") {
+                return "FAILED";
+            }
+
+
+            return "REVIEW REQUIRED";
+
+        }
+
+
+        /* =========================================================
+           RULE HELPERS
+           ========================================================= */
+
+        function ruleCode(rule) {
+
+            return String(
+                rule?.rule_id ||
+                rule?.rule_code ||
+                rule?.code ||
+                ""
+            ).toUpperCase();
+
+        }
+
+
+        function ruleLabel(rule) {
+
+            const code =
+                ruleCode(rule);
+
+
+            const mapping = {
+
+                "LM-001":
+                    "MRP Declaration",
+
+                "LM-002":
+                    "Net Quantity",
+
+                "LM-003":
+                    "Manufacturer / Packer Details",
+
+                "LM-004":
+                    "Date / Expiry Declaration",
+
+                "LM-005":
+                    "Consumer Care Details",
+
+                "LM-006":
+                    "Declaration Count Check",
+
+                "TP-001":
+                    "Tampering Detection",
+
+                "REF-001":
+                    "Reference MRP Consistency",
+
+                "REF-002":
+                    "Reference Net Quantity Consistency"
+
+            };
+
+
+            return mapping[code]
+                || safe(
+                    rule?.field,
+                    "Compliance Requirement"
+                );
+
+        }
+
+
+        function ruleStatus(rule) {
+
+            const raw =
+                String(
+                    rule?.status ||
+                    rule?.result ||
+                    rule?.outcome ||
+                    ""
+                ).toUpperCase();
+
+
+            if (
+                raw === "PASS" ||
+                raw === "PASSED" ||
+                raw === "COMPLIANT"
+            ) {
+                return "passed";
+            }
+
+
+            if (
+                raw === "FAIL" ||
+                raw === "FAILED" ||
+                raw === "NON_COMPLIANT"
+            ) {
+                return "failed";
+            }
+
+
+            if (
+                raw === "NOT_APPLICABLE" ||
+                raw === "N/A"
+            ) {
+                return "warning";
+            }
+
+
+            return "warning";
+
+        }
+
+
+        function ruleStatusText(rule) {
+
+            const raw =
+                String(
+                    rule?.status ||
+                    rule?.result ||
+                    rule?.outcome ||
+                    ""
+                ).toUpperCase();
+
+
+            if (
+                raw === "PASS" ||
+                raw === "PASSED" ||
+                raw === "COMPLIANT"
+            ) {
+                return "Passed";
+            }
+
+
+            if (
+                raw === "FAIL" ||
+                raw === "FAILED" ||
+                raw === "NON_COMPLIANT"
+            ) {
+                return "Failed";
+            }
+
+
+            if (
+                raw === "NOT_APPLICABLE" ||
+                raw === "N/A"
+            ) {
+                return "N/A";
+            }
+
+
+            return "Review";
+
+        }
+
+
+        function ruleDetected(rule) {
+
+            const status =
+                String(
+                    rule?.status ||
+                    rule?.result ||
+                    rule?.outcome ||
+                    ""
+                ).toUpperCase();
+
+
+            if (status === "PASS") {
+                return "Yes";
+            }
+
+
+            if (status === "FAIL") {
+                return "No";
+            }
+
+
+            if (
+                status === "NOT_APPLICABLE"
+            ) {
+                return "N/A";
+            }
+
+
+            return "Review";
+
+        }
+
+
+        function ruleRemark(rule) {
+
+            return safe(
+                rule?.message ||
+                rule?.description ||
+                rule?.explanation ||
+                rule?.remarks,
+                "Requirement evaluated by compliance engine."
+            );
+
+        }
+
+
+        /* =========================================================
+           EMPTY REPORT
+           ========================================================= */
+
+        function showError() {
+
+            document.getElementById("errorBox")
+                .style.display = "block";
+
+
+            document.getElementById("productName")
+                .textContent = "No scan data";
+
+
+            document.getElementById("category")
+                .textContent = "--";
+
+
+            document.getElementById("manufacturer")
+                .textContent = "--";
+
+
+            document.getElementById("statusHeading")
+                .textContent =
+                "Compliance Status: --";
+
+
+            document.getElementById("statusDescription")
+                .textContent =
+                "Please complete an inspection before generating a report.";
+
+
+            document.getElementById("scoreNumber")
+                .textContent = "--%";
+
+
+            document.getElementById("summaryText")
+                .textContent =
+                "No inspection result is available in this browser session.";
+
+        }
+
+
+        /* =========================================================
+           LOAD BACKEND RESULT
+           ========================================================= */
+
+        if (!rawResult) {
+
+            showError();
+
+        } else {
+
+            try {
+
+                const data =
+                    JSON.parse(rawResult);
+
+
+                /* =====================================================
+                   MAIN OBJECTS
+                   ===================================================== */
+
+                const product =
+                    data.product || {};
+
+
+                const ocr =
+                    data.ocr || {};
+
+
+                const barcode =
+                    data.barcode || {};
+
+
+                const tampering =
+                    data.tampering || {};
+
+
+                const comparison =
+                    data.reference_comparison || {};
+
+
+                const compliance =
+                    data.compliance || {};
+
+
+                const extracted =
+                    data.extracted_fields || {};
+
+
+                /* =====================================================
+                   PRODUCT DETAILS
+                   ===================================================== */
+
+                const productName =
+                    safe(
+                        product.name ||
+                        product.product_name ||
+                        extracted.product_name?.value ||
+                        extracted.product_name?.raw ||
+                        manualProductName,
+                        "Unknown Product"
+                    );
+
+
+                const brand =
+                    safe(
+                        product.brand ||
+                        extracted.brand?.value ||
+                        extracted.brand?.raw ||
+                        manualManufacturer,
+                        "Unknown"
+                    );
+
+
+                const category =
+                    safe(
+                        product.category ||
+                        data.category ||
+                        manualCategory,
+                        "Food & Beverages"
+                    );
+
+
+                const barcodeValue =
+                    safe(
+                        barcode.value ||
+                        extracted.barcode?.value ||
+                        extracted.barcode?.raw,
+                        "Not detected"
+                    );
+
+
+                document.getElementById("productName")
+                    .textContent = productName;
+
+
+                document.getElementById("category")
+                    .textContent = category;
+
+
+                document.getElementById("manufacturer")
+                    .textContent = brand;
+
+
+                document.getElementById("barcode")
+                    .textContent = barcodeValue;
+
+
+                /* =====================================================
+                   SCAN / REPORT DETAILS
+                   ===================================================== */
+
+                const scanId =
+                    safe(
+                        data.scan_id ||
+                        lastScanId,
+                        "--"
+                    );
+
+
+                document.getElementById("scanId")
+                    .textContent = scanId;
+
+
+                document.getElementById("reportId")
+                    .textContent =
+                    "DOC-780-" + scanId;
+
+
+                document.getElementById("reportDate")
+                    .textContent =
+                    new Date()
+                        .toLocaleDateString(
+                            "en-IN",
+                            {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric"
+                            }
+                        );
+
+
+                /* =====================================================
+                   REFERENCE MATCH
+                   ===================================================== */
+
+                const referenceFound =
+                    product.reference_found;
+
+
+                let referenceText =
+                    "Not available";
+
+
+                if (referenceFound === true) {
+
+                    referenceText =
+                        "Matched";
+
+                } else if (
+                    referenceFound === false
+                ) {
+
+                    referenceText =
+                        "Not found";
+
+                }
+
+
+                document.getElementById("referenceMatch")
+                    .textContent = referenceText;
+
+
+                /* =====================================================
+                   COMPLIANCE STATUS
+                   ===================================================== */
+
+                const overallStatus =
+                    normalizeStatus(
+                        compliance.overall_status
+                    );
+
+
+                const statusText =
+                    displayStatus(
+                        compliance.overall_status
+                    );
+
+
+                const riskLevel =
+                    String(
+                        compliance.risk_level ||
+                        "NONE"
+                    ).toUpperCase();
+
+
+                document.getElementById("statusHeading")
+                    .textContent =
+                    "Compliance Status: " +
+                    statusText;
+
+
+                document.getElementById("statusDescription")
+                    .textContent =
+                    safe(
+                        compliance.explanation,
+                        "The AI compliance engine completed the automated assessment."
+                    );
+
+
+                /* =====================================================
+                   RULE RESULTS
+                   ===================================================== */
+
+                const rules =
+                    Array.isArray(
+                        compliance.rule_results
+                    )
+                        ? compliance.rule_results
+                        : [];
+
+
+                const applicableRules =
+                    rules.filter(rule => {
+
+                        const status =
+                            String(
+                                rule?.status || ""
+                            ).toUpperCase();
+
+                        return (
+                            status !== "NOT_APPLICABLE" &&
+                            status !== "N/A"
+                        );
+
+                    });
+
+
+                const passedRules =
+                    applicableRules.filter(rule =>
+                        String(
+                            rule?.status || ""
+                        ).toUpperCase() === "PASS"
+                    );
+
+
+                let score = 0;
+
+
+                if (
+                    applicableRules.length > 0
+                ) {
+
+                    score =
+                        Math.round(
+                            (
+                                passedRules.length /
+                                applicableRules.length
+                            ) * 100
+                        );
+
+                } else if (
+                    overallStatus === "compliant"
+                ) {
+
+                    score = 100;
+
+                }
+
+
+                document.getElementById("scoreNumber")
+                    .textContent =
+                    score + "%";
+
+
+                /* =====================================================
+                   COMPLIANCE TABLE
+                   ===================================================== */
+
+                const tableBody =
+                    document.getElementById(
+                        "complianceTableBody"
+                    );
+
+
+                tableBody.innerHTML = "";
+
+
+                if (rules.length > 0) {
+
+                    rules.forEach(rule => {
+
+                        const row =
+                            document.createElement("tr");
+
+
+                        const statusClass =
+                            ruleStatus(rule);
+
+
+                        row.innerHTML = `
+
+                            <td>
+                                ${ruleLabel(rule)}
+                            </td>
+
+                            <td>
+                                ${ruleDetected(rule)}
+                            </td>
+
+                            <td>
+                                <span class="status ${statusClass}">
+                                    ${ruleStatusText(rule)}
+                                </span>
+                            </td>
+
+                            <td>
+                                ${ruleRemark(rule)}
+                            </td>
+
+                        `;
+
+
+                        tableBody.appendChild(row);
+
+                    });
+
+                } else {
+
+                    tableBody.innerHTML = `
+
+                        <tr>
+
+                            <td colspan="4">
+                                No detailed rule results were returned.
+                            </td>
+
+                        </tr>
+
+                    `;
+
+                }
+
+
+                /* =====================================================
+                   EXTRACTED LABEL INFORMATION
+                   ===================================================== */
+
+                const mrp =
+                    extracted.mrp;
+
+
+                const netQuantity =
+                    extracted.net_quantity;
+
+
+                const manufacturingDate =
+                    extracted.manufacturing_date;
+
+
+                const packingDate =
+                    extracted.packing_date;
+
+
+                const bestBefore =
+                    extracted.best_before;
+
+
+                const useBy =
+                    extracted.use_by;
+
+
+                const consumerCare =
+                    extracted.consumer_care_contact ||
+                    extracted.customer_care;
+
+
+                /* ================= MRP ================= */
+
+                const mrpValue =
+                    unwrapField(
+                        mrp,
+                        "Not detected"
+                    );
+
+
+                let mrpDisplay =
+                    "Not detected";
+
+
+                if (
+                    mrpValue !== "Not detected"
+                ) {
+
+                    const numericMrp =
+                        Number(mrpValue);
+
+
+                    if (!isNaN(numericMrp)) {
+
+                        mrpDisplay =
+                            "₹" +
+                            numericMrp.toFixed(2);
+
+                    } else {
+
+                        mrpDisplay =
+                            String(mrpValue);
+
+                    }
+
+                }
+
+
+                document.getElementById("mrp")
+                    .textContent = mrpDisplay;
+
+
+                /* ================= NET QUANTITY ================= */
+
+                const netValue =
+                    unwrapField(
+                        netQuantity,
+                        "Not detected"
+                    );
+
+
+                const netUnit =
+                    netQuantity?.unit ||
+                    "";
+
+
+                let netDisplay =
+                    "Not detected";
+
+
+                if (
+                    netValue !== "Not detected"
+                ) {
+
+                    netDisplay =
+                        String(netValue) +
+                        (
+                            netUnit
+                                ? " " + netUnit
+                                : ""
+                        );
+
+                }
+
+
+                document.getElementById("netQuantity")
+                    .textContent = netDisplay;
+
+
+                /* ================= DATES ================= */
+
+                document.getElementById(
+                    "manufacturingDate"
+                ).textContent =
+                    displayDate(
+                        manufacturingDate
+                    );
+
+
+                document.getElementById(
+                    "packingDate"
+                ).textContent =
+                    displayDate(
+                        packingDate
+                    );
+
+
+                document.getElementById(
+                    "bestBefore"
+                ).textContent =
+                    displayDate(
+                        bestBefore
+                    );
+
+
+                document.getElementById(
+                    "useBy"
+                ).textContent =
+                    displayDate(
+                        useBy
+                    );
+
+
+                /* ================= CONSUMER CARE ================= */
+
+                const consumerCareValue =
+                    unwrapField(
+                        consumerCare,
+                        "Not detected"
+                    );
+
+
+                document.getElementById(
+                    "consumerCare"
+                ).textContent =
+                    consumerCareValue;
+
+
+                /* =====================================================
+                   OCR CONFIDENCE
+                   ===================================================== */
+
+                const averageConfidence =
+                    ocr.average_confidence;
+
+
+                document.getElementById(
+                    "ocrConfidence"
+                ).textContent =
+                    formatPercent(
+                        Number(
+                            averageConfidence
+                        ) * 100
+                    );
+
+
+                /* =====================================================
+                   TAMPERING
+                   ===================================================== */
+
+                const tamperingScore =
+                    tampering.tampering_score;
+
+
+                const tamperingStatus =
+                    safe(
+                        tampering.status,
+                        "Not evaluated"
+                    );
+
+
+                let tamperingDisplay =
+                    tamperingStatus;
+
+
+                if (
+                    tamperingScore !== null &&
+                    tamperingScore !== undefined
+                ) {
+
+                    tamperingDisplay +=
+                        " (" +
+                        Number(
+                            tamperingScore
+                        ).toFixed(2) +
+                        ")";
+
+                }
+
+
+                document.getElementById(
+                    "tamperingStatus"
+                ).textContent =
+                    tamperingDisplay;
+
+
+                /* =====================================================
+                   RISK
+                   ===================================================== */
+
+                document.getElementById(
+                    "riskLevel"
+                ).textContent =
+                    riskLevel;
+
+
+                /* =====================================================
+                   AI FINDINGS
+                   ===================================================== */
+
+                const findingsContainer =
+                    document.getElementById(
+                        "findingsContainer"
+                    );
+
+
+                findingsContainer.innerHTML = "";
+
+
+                const matchedFields =
+                    compliance.matched_fields ||
+                    {};
+
+
+                const mismatchedFields =
+                    compliance.mismatched_fields ||
+                    {};
+
+
+                const missingFields =
+                    compliance.missing_fields ||
+                    [];
+
+
+                const matchedCount =
+                    Array.isArray(
+                        matchedFields
+                    )
+                        ? matchedFields.length
+                        : Object.keys(
+                            matchedFields
+                        ).length;
+
+
+                const mismatchCount =
+                    Array.isArray(
+                        mismatchedFields
+                    )
+                        ? mismatchedFields.length
+                        : Object.keys(
+                            mismatchedFields
+                        ).length;
+
+
+                const missingCount =
+                    Array.isArray(
+                        missingFields
+                    )
+                        ? missingFields.length
+                        : Object.keys(
+                            missingFields
+                        ).length;
+
+
+                /* ================= SUCCESS ================= */
+
+                if (
+                    matchedCount > 0 ||
+                    overallStatus === "compliant"
+                ) {
+
+                    const finding =
+                        document.createElement("div");
+
+
+                    finding.className =
+                        "finding success";
+
+
+                    finding.innerHTML = `
+
+                        <strong>
+                            ✓ Successful Detection
+                        </strong>
+
+                        <br>
+
+                        ${matchedCount > 0
+                            ? matchedCount +
+                              " reference field(s) matched successfully."
+                            : "All applicable automated compliance checks passed."
+                        }
+
+                    `;
+
+
+                    findingsContainer.appendChild(
+                        finding
+                    );
+
+                }
+
+
+                /* ================= WARNING ================= */
+
+                if (
+                    mismatchCount > 0 ||
+                    overallStatus === "review_required"
+                ) {
+
+                    const finding =
+                        document.createElement("div");
+
+
+                    finding.className =
+                        "finding warning-box";
+
+
+                    finding.innerHTML = `
+
+                        <strong>
+                            ⚠ Manual Review Required
+                        </strong>
+
+                        <br>
+
+                        ${mismatchCount > 0
+                            ? mismatchCount +
+                              " field(s) require verification."
+                            : "Some conditions require additional review."
+                        }
+
+                    `;
+
+
+                    findingsContainer.appendChild(
+                        finding
+                    );
+
+                }
+
+
+                /* ================= ISSUE ================= */
+
+                if (
+                    missingCount > 0 ||
+                    overallStatus === "non_compliant"
+                ) {
+
+                    const finding =
+                        document.createElement("div");
+
+
+                    finding.className =
+                        "finding danger";
+
+
+                    finding.innerHTML = `
+
+                        <strong>
+                            ✕ Compliance Issue Detected
+                        </strong>
+
+                        <br>
+
+                        ${missingCount > 0
+                            ? missingCount +
+                              " required field(s) were missing."
+                            : "One or more requirements were not satisfied."
+                        }
+
+                    `;
+
+
+                    findingsContainer.appendChild(
+                        finding
+                    );
+
+                }
+
+
+                /* ================= TAMPERING ================= */
+
+                if (
+                    tampering.anomaly_detected === false
+                ) {
+
+                    const finding =
+                        document.createElement("div");
+
+
+                    finding.className =
+                        "finding success";
+
+
+                    finding.innerHTML = `
+
+                        <strong>
+                            ✓ Tampering Check Completed
+                        </strong>
+
+                        <br>
+
+                        ${safe(
+                            tampering.message,
+                            "No significant anomaly detected."
+                        )}
+
+                    `;
+
+
+                    findingsContainer.appendChild(
+                        finding
+                    );
+
+                }
+
+
+                /* =====================================================
+                   SUMMARY
+                   ===================================================== */
+
+                const explanation =
+                    safe(
+                        compliance.explanation,
+                        "The compliance engine completed the automated assessment."
+                    );
+
+
+                document.getElementById(
+                    "summaryText"
+                ).innerHTML = `
+
+                    DocAI780 analyzed the uploaded
+                    packaged commodity label using
+                    image processing, OCR text extraction,
+                    barcode detection, tampering analysis
+                    and deterministic compliance rules.
+
+                    <br><br>
+
+                    The automated assessment produced a
+                    <strong>
+                        ${score}% compliance score
+                    </strong>
+                    with an overall status of
+                    <strong>
+                        ${statusText}
+                    </strong>.
+
+                    <br><br>
+
+                    ${explanation}
+
+                    <br><br>
+
+                    <strong>
+                        OCR Confidence:
+                    </strong>
+
+                    ${formatPercent(
+                        Number(
+                            averageConfidence
+                        ) * 100
+                    )}
+
+                    <br>
+
+                    <strong>
+                        Barcode:
+                    </strong>
+
+                    ${barcodeValue}
+
+                    <br>
+
+                    <strong>
+                        Tampering:
+                    </strong>
+
+                    ${safe(
+                        tampering.message,
+                        "No significant anomaly detected."
+                    )}
+
+                    <br><br>
+
+                    <strong>
+                        Risk Level:
+                    </strong>
+
+                    ${riskLevel}
+
+                    <br><br>
+
+                    <strong>
+                        Note:
+                    </strong>
+
+                    This report represents an automated
+                    preliminary assessment. Final regulatory
+                    determination should be based on applicable
+                    regulations and appropriate verification.
+
+                `;
+
+
+            } catch (error) {
+
+                console.error(
+                    "Report parsing error:",
+                    error
+                );
+
+
+                showError();
+
+            }
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>

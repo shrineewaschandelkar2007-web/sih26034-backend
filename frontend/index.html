@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DocAI780 | Product Compliance Checker</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: #f5f8fc;
+            color: #172033;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        .navbar {
+            width: 100%;
+            height: 72px;
+            background: rgba(255, 255, 255, 0.97);
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 7%;
+
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.06);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            font-size: 22px;
+            font-weight: 800;
+
+            color: #14213d;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+
+            border-radius: 12px;
+
+            background: linear-gradient(
+                135deg,
+                #1769ff,
+                #00b894
+            );
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: white;
+            font-size: 21px;
+        }
+
+        .logo span {
+            color: #1769ff;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+
+            color: #566176;
+
+            font-size: 14px;
+            font-weight: 600;
+
+            padding: 9px 13px;
+
+            border-radius: 9px;
+
+            transition: 0.25s;
+        }
+
+        .nav-links a:hover {
+            color: #1769ff;
+            background: #eef4ff;
+        }
+
+        .nav-links a.active {
+            color: #1769ff;
+            background: #eef4ff;
+        }
+
+        .nav-links .nav-button {
+            color: white;
+            background: #1769ff;
+
+            margin-left: 6px;
+            padding: 11px 18px;
+        }
+
+        .nav-links .nav-button:hover {
+            color: white;
+            background: #0e54d5;
+        }
+
+        /* ================= HERO ================= */
+
+        .hero {
+            min-height: 650px;
+
+            display: flex;
+            align-items: center;
+
+            padding: 70px 7%;
+
+            position: relative;
+            overflow: hidden;
+
+            background:
+                radial-gradient(
+                    circle at 85% 25%,
+                    rgba(23, 105, 255, 0.15),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 15% 80%,
+                    rgba(0, 184, 148, 0.10),
+                    transparent 25%
+                ),
+                #f7faff;
+        }
+
+        .hero-content {
+            width: 55%;
+            z-index: 2;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 8px 15px;
+
+            background: #eaf2ff;
+            color: #1769ff;
+
+            border-radius: 30px;
+
+            font-size: 14px;
+            font-weight: 700;
+
+            margin-bottom: 22px;
+        }
+
+        .hero h1 {
+            font-size: 58px;
+            line-height: 1.08;
+
+            margin-bottom: 22px;
+
+            color: #14213d;
+            letter-spacing: -1.5px;
+        }
+
+        .hero h1 span {
+            color: #1769ff;
+        }
+
+        .hero p {
+            max-width: 620px;
+
+            font-size: 18px;
+            line-height: 1.7;
+
+            color: #68748a;
+
+            margin-bottom: 32px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .primary-btn,
+        .secondary-btn {
+            text-decoration: none;
+
+            padding: 15px 27px;
+
+            border-radius: 10px;
+
+            font-weight: 700;
+
+            transition: 0.25s;
+        }
+
+        .primary-btn {
+            background: #1769ff;
+            color: white;
+
+            box-shadow:
+                0 10px 25px rgba(23, 105, 255, 0.22);
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            background: #0e54d5;
+        }
+
+        .secondary-btn {
+            color: #1769ff;
+
+            border: 1.5px solid #cbd9f2;
+            background: white;
+        }
+
+        .secondary-btn:hover {
+            background: #eef4ff;
+        }
+
+        /* ================= HERO CARD ================= */
+
+        .hero-visual {
+            width: 45%;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            position: relative;
+        }
+
+        .scan-card {
+            width: 380px;
+            min-height: 390px;
+
+            background: white;
+            border-radius: 25px;
+
+            padding: 25px;
+
+            box-shadow:
+                0 25px 70px rgba(36, 66, 110, 0.15);
+
+            position: relative;
+            z-index: 2;
+        }
+
+        .scan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 20px;
+        }
+
+        .scan-header h3 {
+            font-size: 17px;
+        }
+
+        .status {
+            font-size: 12px;
+            color: #00a67d;
+
+            background: #e8faf5;
+
+            padding: 6px 10px;
+
+            border-radius: 20px;
+
+            font-weight: 700;
+        }
+
+        .product-preview {
+            height: 175px;
+
+            border-radius: 18px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #e9f1ff,
+                    #f1fbf8
+                );
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            margin-bottom: 20px;
+
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-box {
+            width: 115px;
+            height: 135px;
+
+            background: white;
+
+            border-radius: 8px;
+
+            box-shadow:
+                0 10px 20px rgba(0, 0, 0, 0.12);
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            gap: 8px;
+        }
+
+        .product-box .circle {
+            width: 48px;
+            height: 48px;
+
+            border-radius: 50%;
+
+            background: #1769ff;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: white;
+            font-weight: bold;
+        }
+
+        .product-box small {
+            font-size: 9px;
+            color: #555;
+            text-align: center;
+        }
+
+        .scan-line {
+            position: absolute;
+
+            width: 80%;
+            height: 2px;
+
+            background: #1769ff;
+
+            box-shadow:
+                0 0 10px #1769ff;
+
+            animation: scan 2.5s infinite;
+        }
+
+        @keyframes scan {
+
+            0% {
+                top: 20%;
+            }
+
+            50% {
+                top: 80%;
+            }
+
+            100% {
+                top: 20%;
+            }
+
+        }
+
+        .check-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            font-size: 13px;
+            color: #566176;
+        }
+
+        .check-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .check {
+            width: 20px;
+            height: 20px;
+
+            border-radius: 50%;
+
+            background: #e8faf5;
+            color: #00a67d;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            font-size: 12px;
+        }
+
+        /* ================= STATS ================= */
+
+        .stats {
+            display: flex;
+            justify-content: center;
+
+            gap: 80px;
+
+            padding: 35px 7%;
+
+            background: white;
+
+            border-top: 1px solid #edf1f7;
+            border-bottom: 1px solid #edf1f7;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat h2 {
+            color: #1769ff;
+            font-size: 28px;
+        }
+
+        .stat p {
+            color: #788399;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        /* ================= SECTIONS ================= */
+
+        .section {
+            padding: 90px 7%;
+        }
+
+        .section-title {
+            text-align: center;
+
+            max-width: 700px;
+
+            margin: 0 auto 50px;
+        }
+
+        .section-title h2 {
+            font-size: 38px;
+
+            color: #14213d;
+
+            margin-bottom: 12px;
+        }
+
+        .section-title p {
+            color: #738097;
+            line-height: 1.7;
+        }
+
+        /* ================= FEATURES ================= */
+
+        .features {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 25px;
+        }
+
+        .feature-card {
+            background: white;
+
+            border: 1px solid #e9eef6;
+
+            border-radius: 18px;
+
+            padding: 30px;
+
+            transition: 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-7px);
+
+            box-shadow:
+                0 18px 40px
+                rgba(25, 52, 90, 0.10);
+        }
+
+        .feature-icon {
+            width: 52px;
+            height: 52px;
+
+            border-radius: 14px;
+
+            background: #eef4ff;
+            color: #1769ff;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 23px;
+
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 19px;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            color: #778299;
+
+            line-height: 1.6;
+
+            font-size: 14px;
+        }
+
+        /* ================= HOW IT WORKS ================= */
+
+        .steps {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 20px;
+        }
+
+        .step {
+            text-align: center;
+        }
+
+        .step-number {
+            width: 52px;
+            height: 52px;
+
+            margin: 0 auto 18px;
+
+            border-radius: 50%;
+
+            background: #1769ff;
+            color: white;
+
+            display: flex;
+
+            justify-content: center;
+            align-items: center;
+
+            font-weight: 800;
+        }
+
+        .step h3 {
+            font-size: 17px;
+            margin-bottom: 8px;
+        }
+
+        .step p {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #778299;
+        }
+
+        /* ================= TECHNOLOGY ================= */
+
+        .technology {
+            background: white;
+        }
+
+        .tech-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(5, 1fr);
+
+            gap: 18px;
+
+            max-width: 1000px;
+
+            margin: 0 auto;
+        }
+
+        .tech-card {
+            border: 1px solid #e7edf6;
+
+            background: #f8faff;
+
+            border-radius: 14px;
+
+            padding: 22px 14px;
+
+            text-align: center;
+        }
+
+        .tech-card strong {
+            display: block;
+
+            font-size: 15px;
+
+            color: #172033;
+
+            margin-bottom: 6px;
+        }
+
+        .tech-card span {
+            color: #788399;
+            font-size: 12px;
+        }
+
+        /* ================= CTA ================= */
+
+        .cta {
+            margin: 20px 7% 80px;
+
+            padding: 55px;
+
+            border-radius: 25px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #1769ff,
+                    #0d8fca
+                );
+
+            color: white;
+
+            text-align: center;
+
+            box-shadow:
+                0 20px 50px
+                rgba(23, 105, 255, 0.2);
+        }
+
+        .cta h2 {
+            font-size: 34px;
+            margin-bottom: 12px;
+        }
+
+        .cta p {
+            opacity: 0.9;
+            margin-bottom: 25px;
+        }
+
+        .cta a {
+            display: inline-block;
+
+            text-decoration: none;
+
+            background: white;
+            color: #1769ff;
+
+            padding: 14px 25px;
+
+            border-radius: 9px;
+
+            font-weight: 800;
+        }
+
+        /* ================= FOOTER ================= */
+
+        footer {
+            background: #111a2d;
+
+            color: white;
+
+            padding: 35px 7%;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+        }
+
+        footer p {
+            color: #a8b2c5;
+            font-size: 13px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: #a8b2c5;
+
+            text-decoration: none;
+
+            font-size: 13px;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 1000px) {
+
+            .navbar {
+                padding: 0 4%;
+            }
+
+            .nav-links {
+                gap: 0;
+            }
+
+            .nav-links a {
+                padding: 8px;
+                font-size: 12px;
+            }
+
+            .hero {
+                flex-direction: column;
+
+                padding: 60px 5%;
+
+                text-align: center;
+            }
+
+            .hero-content {
+                width: 100%;
+            }
+
+            .hero h1 {
+                font-size: 44px;
+            }
+
+            .hero p {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .hero-visual {
+                width: 100%;
+                margin-top: 50px;
+            }
+
+            .features {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .steps {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .tech-grid {
+                grid-template-columns:
+                    repeat(3, 1fr);
+            }
+
+            .stats {
+                gap: 35px;
+            }
+
+        }
+
+        @media (max-width: 650px) {
+
+            .navbar {
+                height: auto;
+
+                padding: 15px;
+
+                flex-direction: column;
+
+                gap: 12px;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+
+                justify-content: center;
+            }
+
+            .nav-links .nav-button {
+                margin-left: 0;
+            }
+
+            .hero h1 {
+                font-size: 35px;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .primary-btn,
+            .secondary-btn {
+                width: 100%;
+            }
+
+            .scan-card {
+                width: 100%;
+            }
+
+            .stats {
+                flex-wrap: wrap;
+            }
+
+            .section {
+                padding: 65px 5%;
+            }
+
+            .section-title h2 {
+                font-size: 30px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .steps {
+                grid-template-columns: 1fr;
+            }
+
+            .tech-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+            .cta {
+                margin: 10px 5% 60px;
+
+                padding: 40px 20px;
+            }
+
+            footer {
+                flex-direction: column;
+
+                gap: 20px;
+
+                text-align: center;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- ================= NAVIGATION ================= -->
+
+    <header class="navbar">
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                ✓
+            </div>
+
+            <span>DocAI780</span>
+
+        </div>
+
+
+        <nav class="nav-links">
+
+            <a
+                href="index.html"
+                class="active"
+            >
+                Home
+            </a>
+
+            <a href="dashboard.html">
+                Dashboard
+            </a>
+
+            <a href="inspection.html">
+                Inspection
+            </a>
+
+            <a href="result.html">
+                Result
+            </a>
+
+            <a href="history.html">
+                History
+            </a>
+
+            <a href="report.html">
+                Reports
+            </a>
+
+            <a
+                href="inspection.html"
+                class="nav-button"
+            >
+                Start Inspection
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <!-- ================= HERO ================= -->
+
+    <section class="hero">
+
+
+        <div class="hero-content">
+
+            <div class="tag">
+                ✦ AI-Powered Product Compliance
+            </div>
+
+
+            <h1>
+
+                Check Product Labels
+                <span>Smarter.</span>
+
+            </h1>
+
+
+            <p>
+
+                DocAI780 is an intelligent packaged
+                commodity compliance checker that
+                combines OCR, barcode detection,
+                reference matching, tampering analysis
+                and rule-based compliance assessment
+                into one workflow.
+
+            </p>
+
+
+            <div class="hero-buttons">
+
+                <a
+                    href="inspection.html"
+                    class="primary-btn"
+                >
+                    🔍 Start Inspection
+                </a>
+
+
+                <a
+                    href="#how-it-works"
+                    class="secondary-btn"
+                >
+                    How It Works
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= SCANNER CARD ================= -->
+
+        <div class="hero-visual">
+
+            <div class="scan-card">
+
+
+                <div class="scan-header">
+
+                    <h3>
+                        DocAI780 Scanner
+                    </h3>
+
+                    <span class="status">
+                        ● Ready
+                    </span>
+
+                </div>
+
+
+                <div class="product-preview">
+
+                    <div class="product-box">
+
+                        <div class="circle">
+                            AI
+                        </div>
+
+                        <strong>
+                            PRODUCT
+                        </strong>
+
+                        <small>
+                            Packaged Commodity
+                        </small>
+
+                    </div>
+
+
+                    <div class="scan-line"></div>
+
+                </div>
+
+
+                <div class="check-list">
+
+
+                    <div class="check-item">
+
+                        <div class="check-left">
+
+                            <div class="check">
+                                ✓
+                            </div>
+
+                            Product Label
+
+                        </div>
+
+                        <strong>
+                            Ready
+                        </strong>
+
+                    </div>
+
+
+                    <div class="check-item">
+
+                        <div class="check-left">
+
+                            <div class="check">
+                                ✓
+                            </div>
+
+                            OCR Extraction
+
+                        </div>
+
+                        <strong>
+                            Available
+                        </strong>
+
+                    </div>
+
+
+                    <div class="check-item">
+
+                        <div class="check-left">
+
+                            <div class="check">
+                                ✓
+                            </div>
+
+                            Barcode Detection
+
+                        </div>
+
+                        <strong>
+                            Available
+                        </strong>
+
+                    </div>
+
+
+                    <div class="check-item">
+
+                        <div class="check-left">
+
+                            <div class="check">
+                                ✓
+                            </div>
+
+                            Compliance Rules
+
+                        </div>
+
+                        <strong>
+                            Ready
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= STATS ================= -->
+
+    <section class="stats">
+
+
+        <div class="stat">
+
+            <h2>
+                OCR
+            </h2>
+
+            <p>
+                Text Extraction
+            </p>
+
+        </div>
+
+
+        <div class="stat">
+
+            <h2>
+                EAN
+            </h2>
+
+            <p>
+                Barcode Detection
+            </p>
+
+        </div>
+
+
+        <div class="stat">
+
+            <h2>
+                AI
+            </h2>
+
+            <p>
+                Assisted Analysis
+            </p>
+
+        </div>
+
+
+        <div class="stat">
+
+            <h2>
+                Rules
+            </h2>
+
+            <p>
+                Compliance Engine
+            </p>
+
+        </div>
+
+
+    </section>
+
+
+    <!-- ================= FEATURES ================= -->
+
+    <section class="section">
+
+
+        <div class="section-title">
+
+            <h2>
+                Everything You Need
+                for Smart Inspection
+            </h2>
+
+            <p>
+
+                DocAI780 combines image processing,
+                OCR, barcode analysis, reference
+                comparison and compliance assessment
+                into one unified workflow.
+
+            </p>
+
+        </div>
+
+
+        <div class="features">
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    📷
+                </div>
+
+                <h3>
+                    Image Inspection
+                </h3>
+
+                <p>
+
+                    Upload a product label image
+                    and submit it for automated
+                    inspection.
+
+                </p>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    🔤
+                </div>
+
+                <h3>
+                    OCR Extraction
+                </h3>
+
+                <p>
+
+                    Extract useful label information
+                    such as MRP, quantity, dates,
+                    manufacturer and contact details.
+
+                </p>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    🔎
+                </div>
+
+                <h3>
+                    Barcode & Reference Match
+                </h3>
+
+                <p>
+
+                    Use product barcodes to identify
+                    matching reference products and
+                    compare important fields.
+
+                </p>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    🛡️
+                </div>
+
+                <h3>
+                    Tampering Detection
+                </h3>
+
+                <p>
+
+                    Analyze the uploaded label for
+                    significant visual anomalies that
+                    may require further review.
+
+                </p>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    ⚖️
+                </div>
+
+                <h3>
+                    Compliance Engine
+                </h3>
+
+                <p>
+
+                    Evaluate extracted evidence
+                    against configured packaged
+                    commodity compliance rules.
+
+                </p>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    📄
+                </div>
+
+                <h3>
+                    Reports & History
+                </h3>
+
+                <p>
+
+                    Review inspection results,
+                    generate reports and maintain
+                    inspection history.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= TECHNOLOGY ================= -->
+
+    <section class="section technology">
+
+
+        <div class="section-title">
+
+            <h2>
+                Technology Behind DocAI780
+            </h2>
+
+            <p>
+
+                A lightweight web interface connected
+                to a Python-based backend and cloud
+                data layer.
+
+            </p>
+
+        </div>
+
+
+        <div class="tech-grid">
+
+
+            <div class="tech-card">
+
+                <strong>
+                    HTML5
+                </strong>
+
+                <span>
+                    Frontend Structure
+                </span>
+
+            </div>
+
+
+            <div class="tech-card">
+
+                <strong>
+                    CSS3
+                </strong>
+
+                <span>
+                    Responsive UI
+                </span>
+
+            </div>
+
+
+            <div class="tech-card">
+
+                <strong>
+                    JavaScript
+                </strong>
+
+                <span>
+                    Frontend Logic
+                </span>
+
+            </div>
+
+
+            <div class="tech-card">
+
+                <strong>
+                    FastAPI
+                </strong>
+
+                <span>
+                    Python Backend
+                </span>
+
+            </div>
+
+
+            <div class="tech-card">
+
+                <strong>
+                    Supabase
+                </strong>
+
+                <span>
+                    Data & Storage
+                </span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= HOW IT WORKS ================= -->
+
+    <section
+        class="section"
+        id="how-it-works"
+    >
+
+
+        <div class="section-title">
+
+            <h2>
+                How DocAI780 Works
+            </h2>
+
+            <p>
+
+                From product image to compliance
+                result through a simple inspection
+                pipeline.
+
+            </p>
+
+        </div>
+
+
+        <div class="steps">
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    1
+                </div>
+
+                <h3>
+                    Upload
+                </h3>
+
+                <p>
+
+                    Upload an image of the
+                    packaged commodity label.
+
+                </p>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    2
+                </div>
+
+                <h3>
+                    Extract
+                </h3>
+
+                <p>
+
+                    OCR and barcode detection
+                    identify useful product information.
+
+                </p>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    3
+                </div>
+
+                <h3>
+                    Analyze
+                </h3>
+
+                <p>
+
+                    Reference matching,
+                    tampering analysis and
+                    compliance rules are evaluated.
+
+                </p>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    4
+                </div>
+
+                <h3>
+                    Report
+                </h3>
+
+                <p>
+
+                    View the result and generate
+                    a structured compliance report.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= CTA ================= -->
+
+    <section class="cta">
+
+        <h2>
+            Ready to Inspect a Product?
+        </h2>
+
+        <p>
+
+            Upload a packaged commodity label
+            and start a DocAI780 inspection.
+
+        </p>
+
+
+        <a href="inspection.html">
+
+            Start New Inspection →
+
+        </a>
+
+    </section>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+
+        <p>
+
+            © 2026 DocAI780.
+            AI-Based Packaged Commodity
+            Compliance Checker.
+
+        </p>
+
+
+        <div class="footer-links">
+
+
+            <a href="index.html">
+                Home
+            </a>
+
+
+            <a href="dashboard.html">
+                Dashboard
+            </a>
+
+
+            <a href="inspection.html">
+                Inspection
+            </a>
+
+
+            <a href="analysis.html">
+                Analysis
+            </a>
+
+
+            <a href="result.html">
+                Result
+            </a>
+
+
+            <a href="history.html">
+                History
+            </a>
+
+
+            <a href="report.html">
+                Reports
+            </a>
+
+
+        </div>
+
+    </footer>
+
+
+</body>
+
+</html>
+             

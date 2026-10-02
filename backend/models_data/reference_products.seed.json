@@ -1,0 +1,56 @@
+[
+  {
+    "reference_product_id": "demo-parle-monaco-001",
+    "brand": "Parle",
+    "product_name": "Monaco",
+    "barcode": null,
+    "mrp": null,
+    "net_weight": null,
+    "manufacturer": null,
+    "source_note": "PLACEHOLDER - replace with values read from your own reference photo of this product before the demo. Do not present these null/placeholder values as real."
+  },
+  {
+    "reference_product_id": "demo-parle-bourbon-002",
+    "brand": "Parle",
+    "product_name": "Bourbon",
+    "barcode": null,
+    "mrp": null,
+    "net_weight": null,
+    "manufacturer": null,
+    "source_note": "PLACEHOLDER - replace with values read from your own reference photo of this product before the demo."
+  },
+  {
+    "reference_product_id": "demo-parle-g-003",
+    "brand": "Parle",
+    "product_name": "Parle-G",
+    "barcode": "8901719123870",
+    "mrp": 30.0,
+    "net_weight": "250 g",
+    "manufacturer": "Parle Biscuits Pvt Ltd",
+    "batch_no": null,
+    "pkd": "08/08/2026",
+    "best_before": null,
+    "use_by": "05/01/2027",
+    "source_note": "Values read from a real team-tested Parle-G packet during backend development (30/09/2026 session). Barcode confirmed via pyzbar on that photo."
+  },
+  {
+    "reference_product_id": "demo-britannia-bourbon-004",
+    "brand": "Britannia",
+    "product_name": "Bourbon",
+    "barcode": null,
+    "mrp": null,
+    "net_weight": null,
+    "manufacturer": null,
+    "source_note": "PLACEHOLDER - replace with values read from your own reference photo of this product before the demo."
+  },
+  {
+    "reference_product_id": "demo-britannia-good-day-005",
+    "brand": "Britannia",
+    "product_name": "Good Day",
+    "barcode": null,
+    "mrp": null,
+    "net_weight": null,
+    "manufacturer": null,
+    "source_note": "PLACEHOLDER - replace with values read from your own reference photo of this product before the demo."
+  }
+]
