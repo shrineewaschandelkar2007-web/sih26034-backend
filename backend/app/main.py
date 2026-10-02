@@ -67,8 +67,24 @@ local_frontend_origins = [
 ]
 
 
-# Combine configured origins from .env/settings
-# with the explicit local development origins.
+# =========================================================
+# VERCEL FRONTEND
+# =========================================================
+
+# Production frontend deployed on Vercel.
+vercel_frontend_origins = [
+    "https://sih26034-backend-frontend-p9tphk8ui.vercel.app",
+]
+
+
+# =========================================================
+# COMBINE ALLOWED ORIGINS
+# =========================================================
+
+# Combine:
+# 1. Origins configured through .env/settings
+# 2. Local development origins
+# 3. Production Vercel frontend origin
 
 configured_origins = list(
     settings.cors_origins_list
@@ -76,7 +92,9 @@ configured_origins = list(
 
 allowed_origins = list(
     dict.fromkeys(
-        configured_origins + local_frontend_origins
+        configured_origins
+        + local_frontend_origins
+        + vercel_frontend_origins
     )
 )
 
