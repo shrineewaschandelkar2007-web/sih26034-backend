@@ -12,15 +12,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# PaddleOCR downloads its weights on first use; persist them with a volume (see docker-compose.yml)
-# so a container restart does not re-download ~100 MB.
+# PaddleOCR cache + unbuffered Python output
 ENV PADDLE_PDX_CACHE_HOME=/models-cache \
     PYTHONUNBUFFERED=1
 
-EXPOSE 8000
+# Render uses the PORT environment variable for web services.
+EXPOSE 10000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=40s \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')" || exit 1
+    CMD python -c "import os, urllib.request; port=os.getenv('PORT', '10000'); urllib.request.urlopen(f'http://127.0.0.1:{port}/api/v1/health')" || exit 1
 
-# Listen on all interfaces for Render/container networking.
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Bind to Render's PORT.
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-10000}"]
