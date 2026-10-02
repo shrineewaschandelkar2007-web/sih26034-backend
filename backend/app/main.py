@@ -71,9 +71,9 @@ local_frontend_origins = [
 # VERCEL FRONTEND
 # =========================================================
 
-# Production frontend deployed on Vercel.
+# Current production/deployment URL.
 vercel_frontend_origins = [
-    "https://sih26034-backend-frontend-p9tphk8ui.vercel.app",
+    "https://sih26034-backend-frontend-qltjtaeba.vercel.app",
 ]
 
 
@@ -84,7 +84,7 @@ vercel_frontend_origins = [
 # Combine:
 # 1. Origins configured through .env/settings
 # 2. Local development origins
-# 3. Production Vercel frontend origin
+# 3. Current Vercel deployment origin
 
 configured_origins = list(
     settings.cors_origins_list
@@ -99,10 +99,28 @@ allowed_origins = list(
 )
 
 
+# =========================================================
+# FASTAPI CORS MIDDLEWARE
+# =========================================================
+
 app.add_middleware(
     CORSMiddleware,
 
     allow_origins=allowed_origins,
+
+    # Allow Vercel deployment URLs for this frontend project.
+    #
+    # Examples:
+    # https://sih26034-backend-frontend-qltjtaeba.vercel.app
+    # https://sih26034-backend-frontend-xxxxxxxx.vercel.app
+    #
+    # This prevents future Vercel deployment URL changes
+    # from breaking CORS.
+    allow_origin_regex=(
+        r"^https://sih26034-backend-frontend"
+        r"(?:-[a-z0-9]+)?"
+        r"\.vercel\.app$"
+    ),
 
     allow_credentials=True,
 
