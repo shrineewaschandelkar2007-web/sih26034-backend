@@ -12,8 +12,9 @@ The extractor is tolerant of common OCR formatting problems such as:
 - weak manufacturer fragments
 - joined OCR words such as PARLEBISCUTSPVT LTD
 
-Field extraction remains conservative where possible, while preserving
-compatibility with the scan pipeline's manufacturer declaration logic.
+The extractor is conservative about ambiguous numeric values so that
+random OCR numbers such as barcode digits are not incorrectly treated
+as MRP/date declarations.
 """
 
 from __future__ import annotations
@@ -34,8 +35,8 @@ _PATTERNS: dict[str, str] = {
     # MRP
     # -----------------------------------------------------
     "mrp": (
-        r"(?:mrp|m\.r\.p)"
-        r"[^\d]{0,20}"
+        r"\b(?:mrp|m\.r\.p)\b"
+        r"[^\d\n]{0,30}"
         r"(?:rs\.?|inr|₹)?"
         r"\s*"
         r"([\d]+[.,]?\d*)"
@@ -43,15 +44,22 @@ _PATTERNS: dict[str, str] = {
 
     # -----------------------------------------------------
     # NET QUANTITY
+    #
+    # Includes common OCR variants:
+    #   Net Wt
+    #   Net Weight
+    #   Net We
+    #   Net Wt.
+    #   Net Qty
     # -----------------------------------------------------
     "net_quantity": (
-        r"(?:net\s*(?:wt|weight|qty|quantity|contents))"
+        r"\b(?:net\s*(?:wt|weight|we|qty|quantity|contents))\b"
         r"[:\s.]*"
         r"("
         r"\d+\.?\d*"
         r"(?:\s*(?:kg|gms|gm|g|ml|litre|liter|l))?"
         r"(?:\s*\+\s*\d+\.?\d*"
-        r"(?:\s*(?:kg|gms|gm|g|ml|l))?"
+        r"(?:\s*(?:kg|gms|gm|g|ml|litre|liter|l))?"
         r"\s*extra)?"
         r"(?:\s*=\s*\d+\.?\d*"
         r"(?:\s*(?:kg|gms|gm|g|ml|litre|liter|l))?"
@@ -63,12 +71,15 @@ _PATTERNS: dict[str, str] = {
     # MANUFACTURING / PACKING DATE
     # -----------------------------------------------------
     "manufacturing_date": (
-        r"(?:pkd|mfd|mfg|manufactured|packed|packaging)"
+        r"(?:\bpkd\b|\bmfd\b|\bmfg\b|\bmanufactured\b|\bpacked\b|\bpackaging\b)"
         r"[.\s]*(?:date|on|dt)?"
         r"[:\s.]"
         r"("
-        r"\d{1,2}\s*[/\-.]\s*\d{1,2}"
-        r"(?:\s*[/\-.]\s*\d{2,4})?"
+        r"\d{1,2}\s*[/\-]\s*\d{1,2}"
+        r"(?:\s*[/\-]\s*\d{2,4})?"
+        r"|"
+        r"\d{1,2}\s*\.\s*\d{1,2}"
+        r"\s*\.\s*\d{2,4}"
         r")"
     ),
 
@@ -76,12 +87,16 @@ _PATTERNS: dict[str, str] = {
     # BEST BEFORE
     # -----------------------------------------------------
     "best_before": (
-        r"best\s*before"
+        r"\bbest\s*before\b"
         r"[:\s.]"
         r"("
-        r"\d{1,2}\s*[/\-.]\s*\d{1,2}"
-        r"(?:\s*[/\-.]\s*\d{2,4})?"
-        r"|\d+\s*months?"
+        r"\d{1,2}\s*[/\-]\s*\d{1,2}"
+        r"(?:\s*[/\-]\s*\d{2,4})?"
+        r"|"
+        r"\d{1,2}\s*\.\s*\d{1,2}"
+        r"\s*\.\s*\d{2,4}"
+        r"|"
+        r"\d+\s*months?"
         r")"
     ),
 
@@ -89,11 +104,14 @@ _PATTERNS: dict[str, str] = {
     # USE BY
     # -----------------------------------------------------
     "use_by": (
-        r"use\s*by"
+        r"\buse\s*by\b"
         r"[:\s.]"
         r"("
-        r"\d{1,2}\s*[/\-.]\s*\d{1,2}"
-        r"(?:\s*[/\-.]\s*\d{2,4})?"
+        r"\d{1,2}\s*[/\-]\s*\d{1,2}"
+        r"(?:\s*[/\-]\s*\d{2,4})?"
+        r"|"
+        r"\d{1,2}\s*\.\s*\d{1,2}"
+        r"\s*\.\s*\d{2,4}"
         r")"
     ),
 
@@ -101,8 +119,8 @@ _PATTERNS: dict[str, str] = {
     # CUSTOMER / CONSUMER CARE
     # -----------------------------------------------------
     "consumer_care_contact": (
-        r"(?:phone\s*no\.?|consumer\s*care|customer\s*care|"
-        r"toll\s*free)"
+        r"(?:\bphone\s*no\.?\b|\bconsumer\s*care\b|\bcustomer\s*care\b|"
+        r"\btoll\s*free\b)"
         r"[.\s:]*"
         r"("
         r"[\d\s()+\-]{8,25}"
@@ -115,8 +133,8 @@ _PATTERNS: dict[str, str] = {
     # MANUFACTURER / PACKER DECLARATION
     # -----------------------------------------------------
     "manufacturer_address": (
-        r"(?:mfd\.?\s*by|manufactured\s*by|"
-        r"marketed\s*by|packed\s*by)"
+        r"(?:\bmfd\.?\s*by\b|\bmanufactured\s*by\b|"
+        r"\bmarketed\s*by\b|\bpacked\s*by\b)"
         r"[ \t:.\-]*"
         r"([\w\s,.\-()&]{5,180})"
     ),
@@ -125,8 +143,9 @@ _PATTERNS: dict[str, str] = {
     # BATCH
     # -----------------------------------------------------
     "batch_lot_number": (
-        r"(?:batch|lot)"
-        r"[:\s.]*"
+        r"\b(?:batch|lot)\b"
+        r"(?:\s*(?:no|number|num))?"
+        r"[:\s.\-]*"
         r"([\w\-/]{2,30})"
     ),
 
@@ -134,7 +153,7 @@ _PATTERNS: dict[str, str] = {
     # COUNTRY OF ORIGIN
     # -----------------------------------------------------
     "country_of_origin": (
-        r"country\s*of\s*origin"
+        r"\bcountry\s*of\s*origin\b"
         r"[:\s]*"
         r"([\w\s]{3,40}?)(?=\n|$)"
     ),
@@ -199,6 +218,148 @@ def _find(
     )
 
 
+def _clean_line(value: str) -> str:
+    return clean_whitespace(
+        value or ""
+    )
+
+
+def _is_major_declaration_line(
+    line: str,
+) -> bool:
+    """
+    Identify lines where manufacturer/address/date association should stop.
+    """
+
+    line = _clean_line(line)
+
+    if not line:
+        return False
+
+    pattern = (
+        r"^(?:"
+        r"mrp\b|"
+        r"net\s*(?:wt|weight|we|qty|quantity)\b|"
+        r"use\s+by\b|"
+        r"best\s+before\b|"
+        r"pkd\b|"
+        r"mfd\b|"
+        r"mfg\b|"
+        r"manufactured\b|"
+        r"packed\b|"
+        r"batch\b|"
+        r"lot\b|"
+        r"consumer\s+care\b|"
+        r"customer\s+care\b|"
+        r"phone\s+no\b|"
+        r"ingredients\b|"
+        r"nutrition\s+information\b"
+        r")"
+    )
+
+    return bool(
+        re.search(
+            pattern,
+            line,
+            flags=re.IGNORECASE,
+        )
+    )
+
+
+# =========================================================
+# NUMBER / DATE VALIDATION HELPERS
+# =========================================================
+
+def _normalise_number_text(
+    value: str,
+) -> str:
+
+    value = clean_whitespace(
+        value or ""
+    )
+
+    return value.replace(
+        ",",
+        ".",
+        1,
+    )
+
+
+def _looks_like_date(
+    value: str,
+) -> bool:
+    """
+    Reject ambiguous OCR numbers such as:
+        2.3
+        366
+        02754
+
+    Accept:
+        08/08
+        08/08/2026
+        05-01-2027
+        05.01.2027
+    """
+
+    value = clean_whitespace(
+        value or ""
+    )
+
+    if not value:
+        return False
+
+    slash_or_dash = re.fullmatch(
+        r"\d{1,2}\s*[/\-]\s*\d{1,2}"
+        r"(?:\s*[/\-]\s*\d{2,4})?",
+        value,
+    )
+
+    if slash_or_dash:
+        return True
+
+    dotted_full = re.fullmatch(
+        r"\d{1,2}\s*\.\s*\d{1,2}"
+        r"\s*\.\s*\d{2,4}",
+        value,
+    )
+
+    return bool(
+        dotted_full
+    )
+
+
+def _date_value_candidates(
+    text: str,
+) -> list[str]:
+    """
+    Return only plausible declaration dates.
+
+    Deliberately excludes short decimal values such as 2.3.
+    """
+
+    flat = _flat_text(text)
+
+    pattern = (
+        r"\b(?:"
+        r"\d{1,2}\s*[/\-]\s*\d{1,2}"
+        r"(?:\s*[/\-]\s*\d{2,4})?"
+        r"|"
+        r"\d{1,2}\s*\.\s*\d{1,2}"
+        r"\s*\.\s*\d{2,4}"
+        r")\b"
+    )
+
+    return [
+        clean_whitespace(match)
+        for match in re.findall(
+            pattern,
+            flat,
+            flags=re.IGNORECASE,
+        )
+        if _looks_like_date(match)
+    ]
+
+
 # =========================================================
 # MRP EXTRACTION
 # =========================================================
@@ -206,42 +367,155 @@ def _find(
 def _find_all_mrp_candidates(
     text: str,
 ) -> list[tuple[str, bool]]:
+    """
+    Extract MRP only when the numeric value is directly associated
+    with the MRP declaration.
 
-    flat = _flat_text(text)
+    This deliberately avoids flattening the entire OCR result for MRP,
+    because otherwise a line such as:
 
-    pattern = (
-        r"(?:mrp|m\.r\.p)"
-        r"(?P<prefix>[^\d]{0,20})"
-        r"(?:rs\.?|inr|₹)?\s*"
-        r"(?P<value>[\d]+[.,]?\d*)"
+        MRP.
+        BEFORE
+        02754
+
+    could incorrectly turn 02754 into MRP.
+    """
+
+    normalised = _normalise_for_matching(
+        text
     )
+
+    lines = [
+        _clean_line(line)
+        for line in normalised.splitlines()
+    ]
 
     candidates: list[tuple[str, bool]] = []
 
-    for match in re.finditer(
-        pattern,
-        flat,
-        flags=re.IGNORECASE,
-    ):
+    # -----------------------------------------------------
+    # Same-line MRP
+    # -----------------------------------------------------
 
-        prefix = match.group("prefix") or ""
+    same_line_pattern = re.compile(
+        r"\b(?:mrp|m\.r\.p)\b"
+        r"\s*(?:[:=\-]\s*)?"
+        r"(?:(?P<currency>₹|rs\.?|inr)\s*)?"
+        r"(?P<value>\d+(?:[.,]\d+)?)"
+        r"\b",
+        flags=re.IGNORECASE,
+    )
+
+    for line in lines:
+
+        if not line:
+            continue
+
+        match = same_line_pattern.search(
+            line
+        )
+
+        if not match:
+            continue
 
         value = clean_whitespace(
             match.group("value")
         )
 
-        has_currency = bool(
-            re.search(
-                r"(₹|rs\.?|inr)",
-                prefix,
-                flags=re.IGNORECASE,
-            )
+        if not value:
+            continue
+
+        # Extremely long digit sequences are much more likely
+        # to be barcode / licence / phone numbers.
+        digits_only = re.sub(
+            r"\D",
+            "",
+            value,
         )
+
+        if len(digits_only) > 6:
+            continue
 
         candidates.append(
             (
                 value,
-                has_currency,
+                bool(
+                    match.group("currency")
+                ),
+            )
+        )
+
+    if candidates:
+        return candidates
+
+    # -----------------------------------------------------
+    # Two-line MRP:
+    #
+    # MRP
+    # ₹ 30
+    #
+    # or:
+    #
+    # MRP.
+    # Rs. 30
+    # -----------------------------------------------------
+
+    label_only_pattern = re.compile(
+        r"^(?:mrp|m\.r\.p)"
+        r"(?:[.:=\-])?$",
+        flags=re.IGNORECASE,
+    )
+
+    value_line_pattern = re.compile(
+        r"^(?:(?P<currency>₹|rs\.?|inr)\s*)?"
+        r"(?P<value>\d+(?:[.,]\d+)?)"
+        r"(?:\s+.*)?$",
+        flags=re.IGNORECASE,
+    )
+
+    for index, line in enumerate(lines):
+
+        if not label_only_pattern.fullmatch(
+            line
+        ):
+            continue
+
+        if index + 1 >= len(lines):
+            continue
+
+        next_line = lines[index + 1]
+
+        # Reject obvious unrelated declaration lines.
+        if _is_major_declaration_line(
+            next_line
+        ):
+            continue
+
+        match = value_line_pattern.fullmatch(
+            next_line
+        )
+
+        if not match:
+            continue
+
+        value = clean_whitespace(
+            match.group("value")
+        )
+
+        digits_only = re.sub(
+            r"\D",
+            "",
+            value,
+        )
+
+        if len(digits_only) > 6:
+            continue
+
+        candidates.append(
+            (
+                value,
+                bool(
+                    match.group("currency")
+                ),
             )
         )
 
@@ -255,50 +529,150 @@ def _find_all_mrp_candidates(
 def _extract_net_quantity(
     text: str,
 ) -> str | None:
+    """
+    Extract net quantity from same-line or immediately-following-line
+    declarations.
 
-    normalised = _normalise_for_matching(text)
-    flat = _flat_text(normalised)
+    Supports OCR variants such as:
+        Net Wt: 300g
+        Net We: 300g
+        Net Weight: 300 g
+        Net Wt:
+        300g
+    """
 
-    match = re.search(
-        _PATTERNS["net_quantity"],
-        flat,
+    normalised = _normalise_for_matching(
+        text
+    )
+
+    lines = [
+        _clean_line(line)
+        for line in normalised.splitlines()
+    ]
+
+    quantity_pattern = re.compile(
+        r"^(?:"
+        r"\d+(?:\.\d+)?"
+        r"(?:\s*(?:kg|gms|gm|g|ml|litre|liter|l))?"
+        r"(?:\s*\+\s*\d+(?:\.\d+)?"
+        r"(?:\s*(?:kg|gms|gm|g|ml|litre|liter|l))?"
+        r"\s*extra)?"
+        r"(?:\s*=\s*\d+(?:\.\d+)?"
+        r"(?:\s*(?:kg|gms|gm|g|ml|litre|liter|l))?"
+        r")?"
+        r")"
+        r"$",
         flags=re.IGNORECASE,
     )
 
-    if match:
-        return clean_whitespace(
-            match.group(1)
-        )
+    label_pattern = re.compile(
+        r"\bnet\s*(?:wt|weight|we|qty|quantity|contents)\b",
+        flags=re.IGNORECASE,
+    )
 
-    for line in normalised.splitlines():
+    # -----------------------------------------------------
+    # 1. Same line
+    # -----------------------------------------------------
 
-        line_clean = clean_whitespace(line)
+    same_line_pattern = re.compile(
+        r"\bnet\s*(?:wt|weight|we|qty|quantity|contents)\b"
+        r"[:\s.]*"
+        r"(?P<value>"
+        r"\d+(?:\.\d+)?"
+        r"(?:\s*(?:kg|gms|gm|g|ml|litre|liter|l))?"
+        r"(?:\s*\+\s*\d+(?:\.\d+)?"
+        r"(?:\s*(?:kg|gms|gm|g|ml|litre|liter|l))?"
+        r"\s*extra)?"
+        r"(?:\s*=\s*\d+(?:\.\d+)?"
+        r"(?:\s*(?:kg|gms|gm|g|ml|litre|liter|l))?"
+        r")?"
+        r")",
+        flags=re.IGNORECASE,
+    )
 
-        if not line_clean:
+    for line in lines:
+
+        if not line:
             continue
 
-        if not re.search(
-            r"\bnet\s*(?:wt|weight|qty|quantity|contents)\b",
-            line_clean,
-            flags=re.IGNORECASE,
+        match = same_line_pattern.search(
+            line
+        )
+
+        if match:
+
+            value = clean_whitespace(
+                match.group("value")
+            )
+
+            if value:
+                return value
+
+    # -----------------------------------------------------
+    # 2. Label line followed by quantity line
+    # -----------------------------------------------------
+
+    for index, line in enumerate(lines):
+
+        if not label_pattern.search(
+            line
         ):
             continue
 
-        number_match = re.search(
-            r"\b\d+(?:\.\d+)?"
-            r"(?:\s*(?:kg|gms|gm|g|ml|litre|liter|l))?"
-            r"(?:\s*\+\s*\d+(?:\.\d+)?"
-            r"(?:\s*(?:kg|gms|gm|g|ml|l))?"
-            r"\s*extra)?"
-            r"(?:\s*=\s*\d+(?:\.\d+)?"
-            r"(?:\s*(?:kg|gms|gm|g|ml|litre|liter|l))?)?",
-            line_clean,
+        # First try remaining text after the label.
+        tail_match = re.search(
+            r"\bnet\s*(?:wt|weight|we|qty|quantity|contents)\b"
+            r"[\s:.\-]*(.*)$",
+            line,
             flags=re.IGNORECASE,
         )
 
-        if number_match:
+        if tail_match:
+
+            tail = clean_whitespace(
+                tail_match.group(1)
+            )
+
+            quantity_match = re.search(
+                r"^"
+                r"(\d+(?:\.\d+)?"
+                r"(?:\s*(?:kg|gms|gm|g|ml|litre|liter|l))?"
+                r"(?:\s*\+\s*\d+(?:\.\d+)?"
+                r"(?:\s*(?:kg|gms|gm|g|ml|litre|liter|l))?"
+                r"\s*extra)?"
+                r"(?:\s*=\s*\d+(?:\.\d+)?"
+                r"(?:\s*(?:kg|gms|gm|g|ml|litre|liter|l))?"
+                r")?"
+                r")"
+                r"$",
+                tail,
+                flags=re.IGNORECASE,
+            )
+
+            if quantity_match:
+                return clean_whitespace(
+                    quantity_match.group(1)
+                )
+
+        # Try the next line.
+        if index + 1 >= len(lines):
+            continue
+
+        next_line = lines[index + 1]
+
+        if not next_line:
+            continue
+
+        if _is_major_declaration_line(
+            next_line
+        ):
+            continue
+
+        if quantity_pattern.fullmatch(
+            next_line
+        ):
             return clean_whitespace(
-                number_match.group(0)
+                next_line
             )
 
     return None
@@ -312,16 +686,8 @@ def _date_candidates(
     text: str,
 ) -> list[str]:
 
-    flat = _flat_text(text)
-
-    return re.findall(
-        r"\b"
-        r"\d{1,2}\s*[/\-.]\s*"
-        r"\d{1,2}"
-        r"(?:\s*[/\-.]\s*\d{2,4})?"
-        r"\b",
-        flat,
-        flags=re.IGNORECASE,
+    return _date_value_candidates(
+        text
     )
 
 
@@ -329,86 +695,149 @@ def _extract_date_after_label(
     text: str,
     label_pattern: str,
 ) -> str | None:
+    """
+    Search only locally around a declaration label.
 
-    flat = _flat_text(text)
+    This prevents unrelated numbers such as 2.3 from being selected
+    as a manufacturing date simply because "Pkd." exists somewhere
+    else in the OCR output.
+    """
 
-    pattern = (
-        rf"(?:{label_pattern})"
-        rf"(?:\s|[:.\-])*"
-        rf"("
-        rf"\d{{1,2}}\s*[/\-.]\s*"
-        rf"\d{{1,2}}"
-        rf"(?:\s*[/\-.]\s*\d{{2,4}})?"
-        rf")"
+    normalised = _normalise_for_matching(
+        text
     )
 
-    match = re.search(
-        pattern,
-        flat,
+    lines = [
+        _clean_line(line)
+        for line in normalised.splitlines()
+    ]
+
+    compiled_label = re.compile(
+        label_pattern,
         flags=re.IGNORECASE,
     )
 
-    if match:
-        return clean_whitespace(
-            match.group(1)
+    inline_date_pattern = re.compile(
+        r"("
+        r"\d{1,2}\s*[/\-]\s*\d{1,2}"
+        r"(?:\s*[/\-]\s*\d{2,4})?"
+        r"|"
+        r"\d{1,2}\s*\.\s*\d{1,2}"
+        r"\s*\.\s*\d{2,4}"
+        r")",
+        flags=re.IGNORECASE,
+    )
+
+    for index, line in enumerate(lines):
+
+        match = compiled_label.search(
+            line
         )
+
+        if not match:
+            continue
+
+        # -------------------------------------------------
+        # Same line after label
+        # -------------------------------------------------
+
+        tail = line[
+            match.end():
+        ].strip(
+            " \t:.-"
+        )
+
+        date_match = inline_date_pattern.search(
+            tail
+        )
+
+        if date_match:
+
+            value = clean_whitespace(
+                date_match.group(1)
+            )
+
+            if _looks_like_date(
+                value
+            ):
+                return value
+
+        # -------------------------------------------------
+        # Next 1–2 lines only
+        # -------------------------------------------------
+
+        for offset in (1, 2):
+
+            candidate_index = (
+                index + offset
+            )
+
+            if candidate_index >= len(lines):
+                break
+
+            candidate_line = lines[
+                candidate_index
+            ]
+
+            if not candidate_line:
+                continue
+
+            if (
+                offset > 1
+                and _is_major_declaration_line(
+                    candidate_line
+                )
+            ):
+                break
+
+            date_match = inline_date_pattern.search(
+                candidate_line
+            )
+
+            if date_match:
+
+                value = clean_whitespace(
+                    date_match.group(1)
+                )
+
+                if _looks_like_date(
+                    value
+                ):
+                    return value
 
     return None
 
 
 def _extract_spatially_separated_dates(
     text: str,
-) -> tuple[str | None, str | None, str | None]:
+) -> tuple[
+    str | None,
+    str | None,
+    str | None,
+]:
 
     pkd = _extract_date_after_label(
         text,
-        r"(?:pkd|mfd|mfg|manufactured|packed|packaging)",
+        r"(?:\bpkd\b|\bmfd\b|\bmfg\b|\bmanufactured\b|\bpacked\b|\bpackaging\b)",
     )
 
     use_by = _extract_date_after_label(
         text,
-        r"use\s*by",
+        r"\buse\s*by\b",
     )
 
     best_before = _extract_date_after_label(
         text,
-        r"best\s*before",
+        r"\bbest\s*before\b",
     )
 
-    dates = _date_candidates(text)
-
-    flat_lower = _flat_text(text).lower()
-
-    if pkd is None and dates:
-
-        if (
-            "pkd" in flat_lower
-            or "mfd" in flat_lower
-            or "mfg" in flat_lower
-            or "manufactured" in flat_lower
-            or "packed" in flat_lower
-        ):
-            pkd = dates[0]
-
-    if use_by is None and dates:
-
-        if "use by" in flat_lower:
-
-            if len(dates) >= 2:
-                use_by = dates[1]
-
-            elif len(dates) == 1 and pkd != dates[0]:
-                use_by = dates[0]
-
-    if best_before is None and dates:
-
-        if "best before" in flat_lower:
-
-            if len(dates) >= 2:
-                best_before = dates[-1]
-
-            elif len(dates) == 1:
-                best_before = dates[0]
+    # Deliberately DO NOT use a global "first date" fallback.
+    #
+    # Doing that caused OCR values such as "2.3" from nutrition
+    # information to become manufacturing dates when "Pkd." appeared
+    # elsewhere in the document.
+    #
+    # Dates must now be spatially associated with their labels.
 
     return (
         pkd,
@@ -432,6 +861,7 @@ def _is_valid_company_candidate(
         (P)-PARLEBISCUTSPVT LTD.3.SEC.1
         ltd.
         pvt
+        305, 3383
 
     Allows:
 
@@ -440,7 +870,9 @@ def _is_valid_company_candidate(
         XYZ PRODUCTS LTD
     """
 
-    candidate = clean_whitespace(candidate)
+    candidate = clean_whitespace(
+        candidate
+    )
 
     if len(candidate) < 8:
         return False
@@ -456,7 +888,7 @@ def _is_valid_company_candidate(
     if len(words) < 2:
         return False
 
-    # OCR garbage is frequently accompanied by digits.
+    # OCR company candidates containing digits are highly suspicious.
     if re.search(
         r"\d",
         candidate,
@@ -588,6 +1020,12 @@ def _has_address_evidence(
         "nagar",
         "industrial",
         "estate",
+        "district",
+        "dist.",
+        "taluk",
+        "phase",
+        "plot",
+        "sector",
     )
 
     if any(
@@ -633,7 +1071,10 @@ def _clean_manufacturer_candidate(
 
 def _split_manufacturer_and_address(
     declaration: str,
-) -> tuple[str | None, str | None]:
+) -> tuple[
+    str | None,
+    str | None,
+]:
 
     declaration = _clean_manufacturer_candidate(
         declaration
@@ -699,22 +1140,93 @@ def _split_manufacturer_and_address(
     )
 
 
+def _join_manufacturer_lines(
+    lines: list[str],
+    start_index: int,
+) -> tuple[
+    str | None,
+    int,
+]:
+
+    fragments: list[str] = []
+
+    for offset in range(
+        0,
+        3,
+    ):
+
+        index = (
+            start_index
+            + offset
+        )
+
+        if index >= len(lines):
+            break
+
+        line = _clean_manufacturer_candidate(
+            lines[index]
+        )
+
+        if not line:
+            continue
+
+        if offset > 0 and _is_major_declaration_line(
+            line
+        ):
+            break
+
+        fragments.append(
+            line
+        )
+
+        joined = clean_whitespace(
+            " ".join(fragments)
+        )
+
+        # Once a valid company suffix appears, stop company collection.
+        if re.search(
+            r"\b(?:PVT\.?\s*LTD|PRIVATE\s+LIMITED|LIMITED|LTD\.?|LLP)\b",
+            joined,
+            flags=re.IGNORECASE,
+        ):
+            return (
+                joined,
+                index,
+            )
+
+    if not fragments:
+        return None, start_index
+
+    return (
+        clean_whitespace(
+            " ".join(fragments)
+        ),
+        start_index
+        + len(fragments)
+        - 1,
+    )
+
+
 def _extract_manufacturer_candidates(
     text: str,
-) -> tuple[str | None, str | None]:
+) -> tuple[
+    str | None,
+    str | None,
+]:
 
     normalised = _normalise_for_matching(
         text
     )
 
     lines = [
-        clean_whitespace(line)
+        _clean_line(line)
         for line in normalised.splitlines()
-        if clean_whitespace(line)
+        if _clean_line(line)
     ]
 
     manufacturer: str | None = None
     address: str | None = None
+    manufacturer_line_index = -1
 
     # =====================================================
     # 1. EXPLICIT MANUFACTURER DECLARATION
@@ -745,6 +1257,8 @@ def _extract_manufacturer_candidates(
             match.group(1)
         )
 
+        end_index = index
+
         # Case:
         #
         # MFD BY:
@@ -752,16 +1266,35 @@ def _extract_manufacturer_candidates(
         #
         if not candidate:
 
-            if index + 1 < len(lines):
-
-                next_line = _clean_manufacturer_candidate(
-                    lines[index + 1]
+            candidate, end_index = (
+                _join_manufacturer_lines(
+                    lines,
+                    index + 1,
                 )
+            )
 
-                if _is_valid_company_candidate(
-                    next_line
-                ):
-                    candidate = next_line
+        # Candidate may itself be incomplete, for example:
+        #
+        # MFD BY: Parle Biscuits
+        # Pvt Ltd
+        #
+        elif not re.search(
+            r"\b(?:PVT\.?\s*LTD|PRIVATE\s+LIMITED|LIMITED|LTD\.?|LLP)\b",
+            candidate,
+            flags=re.IGNORECASE,
+        ) and index + 1 < len(lines):
+
+            continuation = _clean_line(
+                lines[index + 1]
+            )
+
+            if continuation and not _is_major_declaration_line(
+                continuation
+            ):
+                candidate = clean_whitespace(
+                    f"{candidate} {continuation}"
+                )
+                end_index = index + 1
 
         if not candidate:
             continue
@@ -776,6 +1309,7 @@ def _extract_manufacturer_candidates(
         if manufacturer_candidate:
 
             manufacturer = manufacturer_candidate
+            manufacturer_line_index = end_index
 
             if address_candidate:
                 address = address_candidate
@@ -783,7 +1317,107 @@ def _extract_manufacturer_candidates(
             break
 
     # =====================================================
-    # 2. MFD / BY SPLIT ACROSS MULTIPLE LINES
+    # 2. "AT:" / "C- AT:" STYLE MANUFACTURER DECLARATION
+    #
+    # Some labels use:
+    #
+    # C- At: Mrs. XYZ Food Specialities Limited,
+    #
+    # or OCR may split it across:
+    #
+    # C- At: Mrs.
+    # XYZ Food Specialities Limited,
+    # =====================================================
+
+    if manufacturer is None:
+
+        at_pattern = re.compile(
+            r"^(?:"
+            r"[A-Z0-9\-]{1,4}\s*[-:]\s*"
+            r")?at\s*:\s*(.*)$",
+            flags=re.IGNORECASE,
+        )
+
+        for index, line in enumerate(lines):
+
+            match = at_pattern.match(
+                line
+            )
+
+            if not match:
+                continue
+
+            first_fragment = _clean_manufacturer_candidate(
+                match.group(1)
+            )
+
+            fragments: list[str] = []
+
+            if first_fragment:
+                fragments.append(
+                    first_fragment
+                )
+
+            # Join up to two following lines until a company suffix.
+            for offset in (1, 2):
+
+                candidate_index = (
+                    index + offset
+                )
+
+                if candidate_index >= len(lines):
+                    break
+
+                next_line = _clean_line(
+                    lines[candidate_index]
+                )
+
+                if not next_line:
+                    continue
+
+                if _is_major_declaration_line(
+                    next_line
+                ):
+                    break
+
+                fragments.append(
+                    next_line
+                )
+
+                joined = clean_whitespace(
+                    " ".join(fragments)
+                )
+
+                if re.search(
+                    r"\b(?:PVT\.?\s*LTD|PRIVATE\s+LIMITED|LIMITED|LTD\.?|LLP)\b",
+                    joined,
+                    flags=re.IGNORECASE,
+                ):
+                    break
+
+            candidate = clean_whitespace(
+                " ".join(fragments)
+            )
+
+            (
+                manufacturer_candidate,
+                address_candidate,
+            ) = _split_manufacturer_and_address(
+                candidate
+            )
+
+            if manufacturer_candidate:
+
+                manufacturer = manufacturer_candidate
+                manufacturer_line_index = index
+
+                if address_candidate:
+                    address = address_candidate
+
+                break
+
+    # =====================================================
+    # 3. MFD / BY SPLIT ACROSS MULTIPLE LINES
     # =====================================================
 
     if manufacturer is None:
@@ -802,7 +1436,7 @@ def _extract_manufacturer_candidates(
             if index + 2 >= len(lines):
                 continue
 
-            by_line = clean_whitespace(
+            by_line = _clean_line(
                 lines[index + 1]
             )
 
@@ -827,6 +1461,9 @@ def _extract_manufacturer_candidates(
             if manufacturer_candidate:
 
                 manufacturer = manufacturer_candidate
+                manufacturer_line_index = (
+                    index + 2
+                )
 
                 if address_candidate:
                     address = address_candidate
@@ -834,18 +1471,18 @@ def _extract_manufacturer_candidates(
                 break
 
     # =====================================================
-    # 3. GENERIC COMPANY FALLBACK
+    # 4. GENERIC COMPANY FALLBACK
     # =====================================================
 
     if manufacturer is None:
 
         candidates: list[
-            tuple[int, str]
+            tuple[int, str, int]
         ] = []
 
-        for line in lines:
+        for index, line in enumerate(lines):
 
-            candidate = clean_whitespace(
+            candidate = _clean_line(
                 line
             )
 
@@ -864,7 +1501,22 @@ def _extract_manufacturer_candidates(
                     "customer care",
                     "phone no",
                     "email",
+                    "ingredients",
+                    "nutrition information",
                 )
+            ):
+                continue
+
+            # A line beginning with a single OCR fragment is suspicious.
+            words = candidate.split()
+
+            if (
+                words
+                and len(
+                    words[0].strip(
+                        ".,()"
+                    )
+                ) < 2
             ):
                 continue
 
@@ -936,6 +1588,8 @@ def _extract_manufacturer_candidates(
                 "food",
                 "products",
                 "industries",
+                "nutritionals",
+                "specialities",
             ):
 
                 if keyword in normalized_candidate.lower():
@@ -963,7 +1617,10 @@ def _extract_manufacturer_candidates(
                 )
             )
 
-            score -= digit_count * 10
+            score -= (
+                digit_count
+                * 10
+            )
 
             # Brackets are suspicious in company-name extraction.
             if re.search(
@@ -986,6 +1643,7 @@ def _extract_manufacturer_candidates(
                 (
                     score,
                     normalized_candidate,
+                    index,
                 )
             )
 
@@ -996,15 +1654,17 @@ def _extract_manufacturer_candidates(
                 reverse=True,
             )
 
-            best_score, best_candidate = (
+            best_score, best_candidate, best_index = (
                 candidates[0]
             )
 
             if best_score >= 4:
+
                 manufacturer = best_candidate
+                manufacturer_line_index = best_index
 
     # =====================================================
-    # 4. ADDRESS ASSOCIATION
+    # 5. ADDRESS ASSOCIATION
     # =====================================================
 
     if manufacturer:
@@ -1014,27 +1674,34 @@ def _extract_manufacturer_candidates(
         ):
             address = manufacturer
 
-        manufacturer_index = -1
+        # Find the source line where manufacturer was identified.
+        if manufacturer_line_index < 0:
 
-        for index, line in enumerate(lines):
+            for index, line in enumerate(lines):
 
-            normalized_line = (
-                _normalise_joined_company_name(
-                    clean_whitespace(line)
+                normalized_line = (
+                    _normalise_joined_company_name(
+                        line
+                    )
                 )
-            )
 
-            if not normalized_line:
-                continue
+                if not normalized_line:
+                    continue
 
-            if (
-                normalized_line.lower()
-                == manufacturer.lower()
-            ):
-                manufacturer_index = index
-                break
+                if (
+                    normalized_line.lower()
+                    == manufacturer.lower()
+                ):
+                    manufacturer_line_index = index
+                    break
 
-        if address is None and manufacturer_index >= 0:
+        # Look at the following 1–3 lines for address information.
+        if (
+            address is None
+            and manufacturer_line_index >= 0
+        ):
+
+            address_parts: list[str] = []
 
             for offset in (
                 1,
@@ -1043,43 +1710,63 @@ def _extract_manufacturer_candidates(
             ):
 
                 candidate_index = (
-                    manufacturer_index
+                    manufacturer_line_index
                     + offset
                 )
 
                 if candidate_index >= len(lines):
                     break
 
-                candidate_line = clean_whitespace(
+                candidate_line = _clean_line(
                     lines[candidate_index]
                 )
 
+                if not candidate_line:
+                    continue
+
                 # Do not cross another major declaration.
-                if re.match(
-                    r"^(?:mfd|mfg|pkd|use\s+by|"
-                    r"best\s+before|mrp|net\s+(?:wt|weight)|"
-                    r"batch|lot|consumer\s+care|"
-                    r"customer\s+care|phone\s+no)",
-                    candidate_line,
-                    flags=re.IGNORECASE,
+                if _is_major_declaration_line(
+                    candidate_line
                 ):
                     break
 
                 if _has_address_evidence(
                     candidate_line
                 ):
-                    address = candidate_line
-                    break
+                    address_parts.append(
+                        candidate_line
+                    )
+
+                    # Usually one or two address lines are enough.
+                    if (
+                        re.search(
+                            r"\b\d{6}\b",
+                            candidate_line,
+                        )
+                        or "mumbai" in candidate_line.lower()
+                        or "maharashtra" in candidate_line.lower()
+                        or "punjab" in candidate_line.lower()
+                        or "karnataka" in candidate_line.lower()
+                    ):
+                        break
+
+            if address_parts:
+                address = clean_whitespace(
+                    " ".join(address_parts)
+                )
 
     # =====================================================
-    # 5. GLOBAL ADDRESS FALLBACK
+    # 6. GLOBAL ADDRESS FALLBACK
     # =====================================================
+
+    # Only use a global fallback when we have a manufacturer but no
+    # local address. Avoid using arbitrary short numeric OCR fragments.
 
     if manufacturer and address is None:
 
         for line in lines:
 
-            candidate = clean_whitespace(
+            candidate = _clean_line(
                 line
             )
 
@@ -1093,6 +1780,9 @@ def _extract_manufacturer_candidates(
                     "for sale",
                 )
             ):
+                continue
+
+            if len(candidate) < 12:
                 continue
 
             if _has_address_evidence(
@@ -1300,13 +1990,12 @@ def extract_raw_fields(
     # Manufacturer address
     #
     # Primary:
-    #   use an actual address when extracted.
+    #   actual address when extracted.
     #
     # Fallback:
-    #   when OCR gives us a clean manufacturer declaration
-    #   but drops the address portion, preserve the clean
-    #   manufacturer declaration as address evidence for the
-    #   existing scan-pipeline contract.
+    #   preserve the existing scan-pipeline contract where a
+    #   clean manufacturer declaration counts as declaration
+    #   evidence even when OCR drops the address portion.
     # -----------------------------------------------------
 
     if manufacturer_address:
@@ -1359,11 +2048,12 @@ def extract_raw_fields(
 def guess_brand_and_product(
     combined_text: str,
     known_brands: list[str],
-) -> tuple[str | None, str | None]:
+) -> tuple[
+    str | None,
+    str | None,
+]:
 
-    text_lower = (
-        combined_text.lower()
-    )
+    text_lower = combined_text.lower()
 
     for brand in known_brands:
 
