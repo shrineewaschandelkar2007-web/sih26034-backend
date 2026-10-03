@@ -14,8 +14,7 @@ numpy==2.3.5
 opencv-python-headless==4.13.0.92
 
 # --- OCR (PaddleOCR 3.x + PaddlePaddle CPU). Downloads model weights on first use: needs internet once. ---
-paddlepaddle==3.3.1
-paddleocr==3.7.0
+pytesseract==0.3.13
 
 # --- Barcode. pyzbar is only a wrapper: it also needs the system library (apt: libzbar0, brew: zbar). ---
 pyzbar==0.1.9
