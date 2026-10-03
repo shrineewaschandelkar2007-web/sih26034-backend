@@ -4,9 +4,11 @@ Reusable OCR service using Tesseract OCR.
 The service never crashes the whole API because one image failed OCR.
 It returns OCRResult with status="success", "failed", or "unavailable".
 
-This version uses lightweight multi-pass preprocessing to improve OCR
-accuracy on packaged-product labels while keeping memory usage suitable
-for Render.
+This version is optimized for Render:
+- one primary OCR pass for normal images
+- one fallback OCR pass only when confidence is low
+- lightweight preprocessing
+- controlled image size to reduce CPU/RAM usage
 """
 
 from __future__ import annotations
@@ -31,12 +33,20 @@ logger = get_logger(__name__)
 
 MIN_CONFIDENCE_TO_KEEP = 0.15
 
-# Keep OCR images within a reasonable range for Render memory limits.
+# Conditional fallback threshold.
+# If primary OCR is below this confidence, one fallback pass runs.
+FALLBACK_CONFIDENCE_THRESHOLD = 0.45
+
+# Keep OCR images within a practical range for Render.
 MIN_TARGET_SIDE = 1800
 MAX_TARGET_SIDE = 2600
 
 
 def run_ocr(image_bgr: np.ndarray) -> OCRResult:
+    """
+    Public OCR entry point.
+    """
+
     result = _run_ocr(image_bgr)
 
     result.engine_version = package_version("pytesseract")
@@ -49,6 +59,11 @@ def run_ocr(image_bgr: np.ndarray) -> OCRResult:
 # =============================================================
 
 def _run_ocr(image_bgr: np.ndarray) -> OCRResult:
+    """
+    Run OCR using one primary pass and, only when necessary,
+    one fallback pass.
+    """
+
     if image_bgr is None or image_bgr.size == 0:
         return OCRResult(
             status="failed",
@@ -65,33 +80,105 @@ def _run_ocr(image_bgr: np.ndarray) -> OCRResult:
         # -----------------------------------------------------
         # 1. Resize image safely
         # -----------------------------------------------------
-        image_bgr = _resize_for_ocr(image_bgr)
+
+        image_bgr = _resize_for_ocr(
+            image_bgr
+        )
 
         # -----------------------------------------------------
-        # 2. Build lightweight preprocessing variants
+        # 2. Build only two lightweight variants
+        #
+        # Primary:
+        #   enhanced + PSM 11
+        #
+        # Fallback:
+        #   sharpened + PSM 6
         # -----------------------------------------------------
-        variants = _build_preprocessing_variants(image_bgr)
 
-        # -----------------------------------------------------
-        # 3. Run multiple Tesseract passes
-        # -----------------------------------------------------
+        variants = _build_preprocessing_variants(
+            image_bgr
+        )
+
+        if not variants:
+            return OCRResult(
+                status="failed",
+                error_message="No OCR preprocessing variants available.",
+            )
+
         candidates: list[OCRResult] = []
 
-        for variant_name, variant_image, config in variants:
-            try:
-                candidate = _run_tesseract_pass(
-                    variant_image,
-                    config=config,
+        # -----------------------------------------------------
+        # 3. PRIMARY OCR PASS
+        # -----------------------------------------------------
+
+        primary_name, primary_image, primary_config = (
+            variants[0]
+        )
+
+        try:
+            primary_result = _run_tesseract_pass(
+                primary_image,
+                config=primary_config,
+            )
+
+            if primary_result.status == "success":
+                candidates.append(
+                    primary_result
                 )
 
-                if candidate.status == "success":
-                    candidates.append(candidate)
+            logger.info(
+                "OCR pass completed: "
+                "variant=%s confidence=%.4f blocks=%d",
+                primary_name,
+                primary_result.average_confidence,
+                len(primary_result.raw_text),
+            )
+
+        except pytesseract.TesseractNotFoundError:
+            raise
+
+        except Exception as exc:  # noqa: BLE001
+            logger.warning(
+                "Primary OCR pass failed: %s",
+                exc,
+            )
+
+        # -----------------------------------------------------
+        # 4. CONDITIONAL FALLBACK OCR PASS
+        #
+        # Run only when:
+        #   - primary pass succeeded
+        #   - confidence is below threshold
+        # -----------------------------------------------------
+
+        if (
+            candidates
+            and candidates[0].average_confidence
+            < FALLBACK_CONFIDENCE_THRESHOLD
+            and len(variants) > 1
+        ):
+
+            fallback_name, fallback_image, fallback_config = (
+                variants[1]
+            )
+
+            try:
+                fallback_result = _run_tesseract_pass(
+                    fallback_image,
+                    config=fallback_config,
+                )
+
+                if fallback_result.status == "success":
+                    candidates.append(
+                        fallback_result
+                    )
 
                 logger.info(
-                    "OCR pass completed: variant=%s confidence=%.4f blocks=%d",
-                    variant_name,
-                    candidate.average_confidence,
-                    len(candidate.raw_text),
+                    "OCR fallback completed: "
+                    "variant=%s confidence=%.4f blocks=%d",
+                    fallback_name,
+                    fallback_result.average_confidence,
+                    len(fallback_result.raw_text),
                 )
 
             except pytesseract.TesseractNotFoundError:
@@ -99,19 +186,24 @@ def _run_ocr(image_bgr: np.ndarray) -> OCRResult:
 
             except Exception as exc:  # noqa: BLE001
                 logger.warning(
-                    "OCR pass failed for variant=%s: %s",
-                    variant_name,
+                    "OCR fallback failed: %s",
                     exc,
                 )
 
         # -----------------------------------------------------
-        # 4. Select the strongest result
+        # 5. No successful OCR pass
         # -----------------------------------------------------
+
         if not candidates:
+
             return OCRResult(
                 status="failed",
                 error_message="All OCR passes failed.",
             )
+
+        # -----------------------------------------------------
+        # 6. Select strongest result
+        # -----------------------------------------------------
 
         best_result = max(
             candidates,
@@ -121,6 +213,7 @@ def _run_ocr(image_bgr: np.ndarray) -> OCRResult:
         return best_result
 
     except pytesseract.TesseractNotFoundError as exc:
+
         logger.error(
             "Tesseract executable not found: %s",
             exc,
@@ -128,10 +221,13 @@ def _run_ocr(image_bgr: np.ndarray) -> OCRResult:
 
         return OCRResult(
             status="unavailable",
-            error_message="Tesseract OCR executable is not installed.",
+            error_message=(
+                "Tesseract OCR executable is not installed."
+            ),
         )
 
     except Exception as exc:  # noqa: BLE001
+
         logger.error(
             "OCR inference failed: %s",
             exc,
@@ -147,23 +243,37 @@ def _run_ocr(image_bgr: np.ndarray) -> OCRResult:
 # Image preparation
 # =============================================================
 
-def _resize_for_ocr(image_bgr: np.ndarray) -> np.ndarray:
+def _resize_for_ocr(
+    image_bgr: np.ndarray,
+) -> np.ndarray:
     """
     Resize image to a practical OCR range.
 
     Small images are enlarged.
-    Very large images are reduced to avoid excessive memory usage.
+
+    Very large images are reduced to avoid excessive
+    CPU and memory consumption.
     """
 
     height, width = image_bgr.shape[:2]
-    max_side = max(height, width)
+    max_side = max(
+        height,
+        width,
+    )
 
     if max_side == 0:
         return image_bgr
 
-    # Small image -> enlarge.
+    # ---------------------------------------------------------
+    # Small image -> enlarge
+    # ---------------------------------------------------------
+
     if max_side < MIN_TARGET_SIDE:
-        scale = MIN_TARGET_SIDE / float(max_side)
+
+        scale = (
+            MIN_TARGET_SIDE
+            / float(max_side)
+        )
 
         resized = cv2.resize(
             image_bgr,
@@ -175,9 +285,16 @@ def _resize_for_ocr(image_bgr: np.ndarray) -> np.ndarray:
 
         return resized
 
-    # Very large image -> reduce.
+    # ---------------------------------------------------------
+    # Very large image -> reduce
+    # ---------------------------------------------------------
+
     if max_side > MAX_TARGET_SIDE:
-        scale = MAX_TARGET_SIDE / float(max_side)
+
+        scale = (
+            MAX_TARGET_SIDE
+            / float(max_side)
+        )
 
         resized = cv2.resize(
             image_bgr,
@@ -194,11 +311,24 @@ def _resize_for_ocr(image_bgr: np.ndarray) -> np.ndarray:
 
 def _build_preprocessing_variants(
     image_bgr: np.ndarray,
-) -> list[tuple[str, np.ndarray, str]]:
+) -> list[
+    tuple[
+        str,
+        np.ndarray,
+        str,
+    ]
+]:
     """
-    Build several lightweight OCR-friendly image variants.
+    Build two lightweight OCR-friendly variants.
 
-    The variants are deliberately limited to avoid high CPU/RAM usage.
+    Primary:
+        CLAHE-enhanced grayscale + PSM 11
+
+    Fallback:
+        sharpened grayscale + PSM 6
+
+    Only these two variants are created/used so that Render
+    does not spend several minutes running four Tesseract passes.
     """
 
     gray = cv2.cvtColor(
@@ -207,7 +337,7 @@ def _build_preprocessing_variants(
     )
 
     # ---------------------------------------------------------
-    # Variant 1: CLAHE enhanced grayscale
+    # CLAHE local contrast enhancement
     # ---------------------------------------------------------
 
     clahe = cv2.createCLAHE(
@@ -215,9 +345,14 @@ def _build_preprocessing_variants(
         tileGridSize=(8, 8),
     )
 
-    enhanced = clahe.apply(gray)
+    enhanced = clahe.apply(
+        gray
+    )
 
-    # Mild sharpening.
+    # ---------------------------------------------------------
+    # Mild sharpening
+    # ---------------------------------------------------------
+
     sharpen_kernel = np.array(
         [
             [0, -1, 0],
@@ -233,50 +368,24 @@ def _build_preprocessing_variants(
         sharpen_kernel,
     )
 
-    # ---------------------------------------------------------
-    # Variant 2: Otsu threshold
-    # ---------------------------------------------------------
-
-    _, otsu = cv2.threshold(
-        sharpened,
-        0,
-        255,
-        cv2.THRESH_BINARY + cv2.THRESH_OTSU,
-    )
-
-    # ---------------------------------------------------------
-    # Variant 3: Adaptive threshold
-    # ---------------------------------------------------------
-
-    adaptive = cv2.adaptiveThreshold(
-        sharpened,
-        255,
-        cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-        cv2.THRESH_BINARY,
-        31,
-        11,
-    )
-
     return [
         (
             "enhanced_psm11",
             enhanced,
-            "--oem 3 --psm 11 -c preserve_interword_spaces=1",
+            (
+                "--oem 3 "
+                "--psm 11 "
+                "-c preserve_interword_spaces=1"
+            ),
         ),
         (
             "sharpened_psm6",
             sharpened,
-            "--oem 3 --psm 6 -c preserve_interword_spaces=1",
-        ),
-        (
-            "otsu_psm11",
-            otsu,
-            "--oem 3 --psm 11 -c preserve_interword_spaces=1",
-        ),
-        (
-            "adaptive_psm11",
-            adaptive,
-            "--oem 3 --psm 11 -c preserve_interword_spaces=1",
+            (
+                "--oem 3 "
+                "--psm 6 "
+                "-c preserve_interword_spaces=1"
+            ),
         ),
     ]
 
@@ -291,18 +400,28 @@ def _run_tesseract_pass(
     config: str,
 ) -> OCRResult:
     """
-    Run one Tesseract image_to_data pass and convert the result
-    into the project's OCRResult schema.
+    Run one Tesseract image_to_data pass and convert
+    the result into OCRResult.
     """
 
-    # Tesseract works reliably with grayscale or RGB.
+    # ---------------------------------------------------------
+    # Tesseract works reliably with grayscale or RGB images.
+    # ---------------------------------------------------------
+
     if len(image.shape) == 2:
+
         image_for_tesseract = cv2.cvtColor(
             image,
             cv2.COLOR_GRAY2RGB,
         )
+
     else:
+
         image_for_tesseract = image
+
+    # ---------------------------------------------------------
+    # Run Tesseract
+    # ---------------------------------------------------------
 
     data = pytesseract.image_to_data(
         image_for_tesseract,
@@ -311,7 +430,17 @@ def _run_tesseract_pass(
         output_type=Output.DICT,
     )
 
-    blocks = _build_ocr_blocks(data)
+    # ---------------------------------------------------------
+    # Convert Tesseract words to project OCR blocks
+    # ---------------------------------------------------------
+
+    blocks = _build_ocr_blocks(
+        data
+    )
+
+    # ---------------------------------------------------------
+    # Combined text
+    # ---------------------------------------------------------
 
     combined_text = "\n".join(
         block.text
@@ -319,12 +448,22 @@ def _run_tesseract_pass(
         if block.text.strip()
     )
 
+    # ---------------------------------------------------------
+    # Average confidence
+    # ---------------------------------------------------------
+
     if blocks:
+
         average_confidence = float(
-            sum(block.confidence for block in blocks)
+            sum(
+                block.confidence
+                for block in blocks
+            )
             / len(blocks)
         )
+
     else:
+
         average_confidence = 0.0
 
     return OCRResult(
@@ -354,67 +493,114 @@ def _build_ocr_blocks(
 
     line_groups: dict[
         tuple[int, int, int],
-        list[dict[str, float | str]],
+        list[
+            dict[
+                str,
+                float | str,
+            ]
+        ],
     ] = {}
 
     total_items = len(
-        data.get("text", [])
+        data.get(
+            "text",
+            [],
+        )
     )
 
-    for i in range(total_items):
+    for i in range(
+        total_items
+    ):
+
+        # -----------------------------------------------------
+        # Text
+        # -----------------------------------------------------
+
         try:
+
             text = str(
                 data["text"][i]
             ).strip()
-        except (KeyError, IndexError):
+
+        except (
+            KeyError,
+            IndexError,
+        ):
+
             continue
 
         if not text:
             continue
 
+        # -----------------------------------------------------
+        # Confidence
+        # -----------------------------------------------------
+
         try:
+
             confidence = float(
                 data["conf"][i]
             )
+
         except (
             ValueError,
             TypeError,
             IndexError,
             KeyError,
         ):
+
             continue
 
         if confidence < 0:
             continue
 
-        confidence_normalized = confidence / 100.0
+        confidence_normalized = (
+            confidence / 100.0
+        )
 
-        # Keep meaningful low-confidence tokens such as:
-        # "8/1", "300", "₹", "No", etc.
-        # Remove only the worst OCR noise.
-        if confidence_normalized < MIN_CONFIDENCE_TO_KEEP:
+        # -----------------------------------------------------
+        # Filter only the worst OCR noise.
+        #
+        # Numeric/date-like tokens are preserved because
+        # compliance fields depend heavily on them.
+        # -----------------------------------------------------
+
+        if (
+            confidence_normalized
+            < MIN_CONFIDENCE_TO_KEEP
+        ):
+
             if not any(
                 char.isalnum()
                 for char in text
             ):
                 continue
 
+        # -----------------------------------------------------
+        # Tesseract hierarchy
+        # -----------------------------------------------------
+
         try:
+
             block_num = int(
                 data["block_num"][i]
             )
+
             par_num = int(
                 data["par_num"][i]
             )
+
             line_num = int(
                 data["line_num"][i]
             )
+
         except (
             ValueError,
             TypeError,
             IndexError,
             KeyError,
         ):
+
             continue
 
         key = (
@@ -423,29 +609,43 @@ def _build_ocr_blocks(
             line_num,
         )
 
+        # -----------------------------------------------------
+        # Bounding box
+        # -----------------------------------------------------
+
         try:
+
             left = float(
                 data["left"][i]
             )
+
             top = float(
                 data["top"][i]
             )
+
             width = float(
                 data["width"][i]
             )
+
             height = float(
                 data["height"][i]
             )
+
         except (
             ValueError,
             TypeError,
             IndexError,
             KeyError,
         ):
+
             left = 0.0
             top = 0.0
             width = 0.0
             height = 0.0
+
+        # -----------------------------------------------------
+        # Add word to line group
+        # -----------------------------------------------------
 
         line_groups.setdefault(
             key,
@@ -461,31 +661,55 @@ def _build_ocr_blocks(
             }
         )
 
+    # =========================================================
+    # Build line blocks
+    # =========================================================
+
     blocks_with_position: list[
-        tuple[float, float, OCRTextBlock]
+        tuple[
+            float,
+            float,
+            OCRTextBlock,
+        ]
     ] = []
 
     for words in line_groups.values():
+
         if not words:
             continue
 
-        # Left-to-right word ordering.
+        # -----------------------------------------------------
+        # Left -> right ordering
+        # -----------------------------------------------------
+
         words.sort(
             key=lambda item: float(
                 item["left"]
             )
         )
 
+        # -----------------------------------------------------
+        # Build readable line text
+        # -----------------------------------------------------
+
         line_text = " ".join(
-            str(item["text"])
+            str(
+                item["text"]
+            )
             for item in words
         ).strip()
 
         if not line_text:
             continue
 
+        # -----------------------------------------------------
+        # Average line confidence
+        # -----------------------------------------------------
+
         confidences = [
-            float(item["confidence"])
+            float(
+                item["confidence"]
+            )
             for item in words
         ]
 
@@ -496,25 +720,41 @@ def _build_ocr_blocks(
             else 0.0
         )
 
+        # -----------------------------------------------------
+        # Bounding rectangle
+        # -----------------------------------------------------
+
         min_x = min(
-            float(item["left"])
+            float(
+                item["left"]
+            )
             for item in words
         )
 
         min_y = min(
-            float(item["top"])
+            float(
+                item["top"]
+            )
             for item in words
         )
 
         max_x = max(
-            float(item["left"])
-            + float(item["width"])
+            float(
+                item["left"]
+            )
+            + float(
+                item["width"]
+            )
             for item in words
         )
 
         max_y = max(
-            float(item["top"])
-            + float(item["height"])
+            float(
+                item["top"]
+            )
+            + float(
+                item["height"]
+            )
             for item in words
         )
 
@@ -543,7 +783,7 @@ def _build_ocr_blocks(
         )
 
     # ---------------------------------------------------------
-    # Ensure final OCR lines are top-to-bottom, left-to-right.
+    # Top -> bottom, left -> right
     # ---------------------------------------------------------
 
     blocks_with_position.sort(
@@ -569,9 +809,10 @@ def _ocr_quality_score(
     """
     Rank OCR passes.
 
-    Average confidence alone is not enough because a pass might
-    return only a few high-confidence words. This score also
-    rewards useful alphanumeric content.
+    Confidence alone is not enough because an OCR pass might
+    return only a few high-confidence words.
+
+    This score also rewards useful alphanumeric content.
     """
 
     if result.status != "success":
@@ -587,6 +828,7 @@ def _ocr_quality_score(
     total_weight = 0.0
 
     for block in blocks:
+
         text = block.text.strip()
 
         if not text:
@@ -596,7 +838,9 @@ def _ocr_quality_score(
             0.0,
             min(
                 1.0,
-                float(block.confidence),
+                float(
+                    block.confidence
+                ),
             ),
         )
 
@@ -606,7 +850,9 @@ def _ocr_quality_score(
             if char.isalnum()
         )
 
-        useful_characters += alphanumeric_count
+        useful_characters += (
+            alphanumeric_count
+        )
 
         if confidence >= 0.60:
             high_confidence_blocks += 1
@@ -621,6 +867,12 @@ def _ocr_quality_score(
 
     return (
         total_weight
-        + (useful_characters * 0.08)
-        + (high_confidence_blocks * 1.5)
+        + (
+            useful_characters
+            * 0.08
+        )
+        + (
+            high_confidence_blocks
+            * 1.5
+        )
     )
