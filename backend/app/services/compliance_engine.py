@@ -40,6 +40,34 @@ _RULES_PATH = (
 
 
 # =========================================================
+# MANUFACTURER/ADDRESS OCR QUALITY GUARD
+# =========================================================
+
+def _manufacturer_address_has_contact_noise(
+    fields: ExtractedFields,
+) -> bool:
+    # Flag obvious contact-section OCR noise as an unverified declaration.
+    candidate = getattr(fields, "manufacturer_address", None)
+    if candidate is None or not getattr(candidate, "found", False):
+        return False
+
+    # Prefer the selected value. Use raw OCR only when no selected value exists.
+    text = (
+        getattr(candidate, "value", None)
+        or getattr(candidate, "raw", None)
+        or ""
+    )
+    return bool(
+        re.search(
+            r"\b(?:queries|contact|phone(?:\s+no)?|e-?mail|"
+            r"consumer\s+care|customer\s+care|helpline)\b",
+            str(text),
+            flags=re.IGNORECASE,
+        )
+    )
+
+
+# =========================================================
 # FIELD PRESENCE
 # =========================================================
 
@@ -140,8 +168,12 @@ def _declaration_count(
 ) -> int:
     return sum(
         1
-        for check in _FIELD_PRESENT_MAP.values()
+        for field_name, check in _FIELD_PRESENT_MAP.items()
         if check(fields)
+        and not (
+            field_name == "manufacturer_address"
+            and _manufacturer_address_has_contact_noise(fields)
+        )
     )
 
 
@@ -433,22 +465,36 @@ def evaluate_compliance(
                 (fields)
             )
 
-            status = (
-                "PASS"
-                if present
-                else "FAIL"
+            unreliable_manufacturer = (
+                field_name == "manufacturer_address"
+                and _manufacturer_address_has_contact_noise(fields)
             )
 
-            message = (
-                f"OK: {rule['rule_name']}."
-                if present
-                else f"Issue: {description}"
-            )
-
-            if not present:
-                missing_fields.append(
-                    field_name
+            if unreliable_manufacturer:
+                status = "REVIEW_REQUIRED"
+                message = (
+                    "Review required: OCR extracted contact-section text "
+                    "instead of a verified manufacturer/address declaration."
                 )
+                if field_name not in missing_fields:
+                    missing_fields.append(field_name)
+            else:
+                status = (
+                    "PASS"
+                    if present
+                    else "FAIL"
+                )
+
+                message = (
+                    f"OK: {rule['rule_name']}."
+                    if present
+                    else f"Issue: {description}"
+                )
+
+                if not present:
+                    missing_fields.append(
+                        field_name
+                    )
 
         # =====================================================
         # ANY FIELD PRESENT
