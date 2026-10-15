@@ -20,6 +20,7 @@ as MRP/date declarations.
 from __future__ import annotations
 
 import re
+from datetime import date
 
 from app.schemas.product import ExtractedFieldValue
 from app.utils.text import clean_whitespace
@@ -398,9 +399,9 @@ def _find_all_mrp_candidates(
 
     same_line_pattern = re.compile(
         r"\b(?:mrp|m\.r\.p)\b"
-        r"\s*(?:[:=\-]\s*)?"
+        r"\s*(?:[:=\-x]\s*)?"
         r"(?:(?P<currency>₹|rs\.?|inr)\s*)?"
-        r"(?P<value>\d+(?:[.,]\d+)?)"
+        r"(?P<value>\d+(?:[.,]\s*\d+)?)"
         r"\b",
         flags=re.IGNORECASE,
     )
@@ -417,8 +418,10 @@ def _find_all_mrp_candidates(
         if not match:
             continue
 
-        value = clean_whitespace(
-            match.group("value")
+        value = re.sub(
+            r"(?<=[.,])\s+",
+            "",
+            clean_whitespace(match.group("value")),
         )
 
         if not value:
@@ -691,6 +694,33 @@ def _date_candidates(
     )
 
 
+def _is_plausible_manufacturing_date(value: str) -> bool:
+    """Reject malformed or future full dates for PKD/MFD declarations.
+
+    Dates are interpreted in the usual Indian DD/MM/YY or DD/MM/YYYY order.
+    Two-digit years use the common 00-68 -> 2000-2068, 69-99 -> 1969-1999 pivot.
+    A date without an explicit year is left for manual review rather than guessed.
+    """
+    match = re.fullmatch(
+        r"\s*(\d{1,2})\s*[/.-]\s*(\d{1,2})\s*[/.-]\s*(\d{2,4})\s*",
+        value,
+    )
+    if not match:
+        return True
+
+    day_value, month_value, year_value = match.groups()
+    year = int(year_value)
+    if len(year_value) == 2:
+        year += 2000 if year <= 68 else 1900
+
+    try:
+        parsed = date(year, int(month_value), int(day_value))
+    except ValueError:
+        return False
+
+    return parsed <= date.today()
+
+
 def _extract_date_after_label(
     text: str,
     label_pattern: str,
@@ -760,6 +790,15 @@ def _extract_date_after_label(
             if _looks_like_date(
                 value
             ):
+                is_manufacturing_label = bool(
+                    re.search(
+                        r"(?:pkd|mfd|mfg|manufactured|packed|packaging)",
+                        label_pattern,
+                        flags=re.IGNORECASE,
+                    )
+                )
+                if is_manufacturing_label and not _is_plausible_manufacturing_date(value):
+                    return None
                 return value
 
         # -------------------------------------------------
@@ -803,6 +842,15 @@ def _extract_date_after_label(
                 if _looks_like_date(
                     value
                 ):
+                    is_manufacturing_label = bool(
+                        re.search(
+                            r"(?:pkd|mfd|mfg|manufactured|packed|packaging)",
+                            label_pattern,
+                            flags=re.IGNORECASE,
+                        )
+                    )
+                    if is_manufacturing_label and not _is_plausible_manufacturing_date(value):
+                        return None
                     return value
 
     return None
@@ -853,6 +901,20 @@ def _extract_spatially_separated_dates(
 def _is_valid_company_candidate(
     candidate: str,
 ) -> bool:
+    # STRICT OCR COMPANY-CANDIDATE GUARD: reject label/contact noise,
+    # and treat candidates without a recognizable organization marker as uncertain.
+    # This deliberately prefers manual review over a false compliance PASS.
+    candidate_text_for_guard = str(candidate or "")
+    candidate_upper_for_guard = re.sub(r"\s+", " ", candidate_text_for_guard).upper()
+    if re.search(r"\b(?:QUERIES|CONTACT|PHONE|EMAIL|E-MAIL|HELPLINE|CONSUMER CARE|CUSTOMER CARE)\b", candidate_upper_for_guard):
+        return False
+    recognized_company_markers = (
+        " PVT", " PRIVATE", " LTD", " LIMITED", " LLP", " INC",
+        " CORPORATION", " INDUSTRIES", " ENTERPRISES", " ENTERPRISE",
+        " FOODS", " FOOD", " COMPANY", " CO.",
+    )
+    if not any(marker in f" {candidate_upper_for_guard} " for marker in recognized_company_markers):
+        return False
     """
     Validate a possible company name.
 
@@ -874,6 +936,28 @@ def _is_valid_company_candidate(
         candidate
     )
 
+    # OCR sometimes mistakes nearby marketing/contact text for the company.
+    # Such phrases are not valid manufacturer declarations.
+    lower_candidate = candidate.casefold()
+    non_company_phrases = (
+        "queries",
+        "contact",
+        "consumer care",
+        "customer care",
+        "phone no",
+        "e-mail",
+        "email",
+        "visit us",
+        "for sale",
+        "net weight",
+        "nutrition",
+        "mrp",
+        "use by",
+        "best before",
+    )
+    if any(phrase in lower_candidate for phrase in non_company_phrases):
+        return False
+
     if len(candidate) < 8:
         return False
 
@@ -888,11 +972,16 @@ def _is_valid_company_candidate(
     if len(words) < 2:
         return False
 
-    # OCR company candidates containing digits are highly suspicious.
-    if re.search(
-        r"\d",
+    # A trailing six-digit PIN code can belong to a genuine address fragment.
+    # Ignore only that terminal PIN for company-name validation; preserve the
+    # original candidate so downstream address extraction can still see it.
+    candidate_without_trailing_pin = re.sub(
+        r"\s+(?:wt\s*[-:]?\s*)?\d{6}\s*$",
+        "",
         candidate,
-    ):
+        flags=re.IGNORECASE,
+    )
+    if re.search(r"\d", candidate_without_trailing_pin):
         return False
 
     # Suspicious bracket prefix.
